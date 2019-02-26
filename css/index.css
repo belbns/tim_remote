@@ -1,0 +1,275 @@
+
+html, body {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 0;
+    margin: 0;
+    min-width: 720px;
+    max-width: 1024px;
+    width: auto;
+}
+
+#head2 {
+    height: 50px;
+    float: center;
+}
+
+#butt_block {
+    background: Bisque;
+    width: 100%;
+    height: 50px;
+}
+
+#stepp_switch, #dist_block {
+    background: Azure;
+    height: 50px;
+    //left: 10%;
+    width: 100%;
+}
+
+#stepp_block, #helm_block {
+    background: DarkSeaGreen;
+    width: 100%;
+    height: 400px;
+    //padding-left : 5%;
+    //padding-right : 5%;
+}
+#stepp2 {
+    float: right;
+    width: 44%;
+    height: 400px;
+    background: BurlyWood;
+    border-radius: 25px;
+}
+
+#servo {
+    float: right;
+    width: 44%;
+    height: 400px;
+    background: BurlyWood;
+    border-radius: 25px;
+}
+
+
+#stepp1 {
+    float: left;
+    width: 44%;
+    height: 400px;
+    background: BurlyWood;
+    border-radius: 25px;
+}
+
+#motors {
+    float: left;
+    background: BurlyWood;
+    background-image: none; //url(../img/Actions-go-next-48.png);
+    background-position: center right;
+    background-repeat: no-repeat;
+    //background-size: cover;
+    width: 44%;
+    height: 400px;
+    //background: BurlyWood;
+    border-radius: 25px;
+}
+
+#stepp1_info, #stepp2_info, #motors_info, #servo_info {
+    top: 0;
+    height: 40px;
+    padding-left: 4%;
+    width: 100%;
+}
+
+#bt_pwr {
+    color: red;
+    height: 40px;
+    width: 40px;
+    border: 2px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 12px;
+    margin-top: 5px;
+    //margin: 40px 25% 2px 30%;
+    border-radius: 50%;
+    transition: all 0.5s;
+    background: #92c7eb;
+    background-image: url("../img/circle_grey.png");
+    background-size: cover;
+    background-position: center;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 16px;
+}
+
+#dist_plock {
+    padding-top: 5px;
+}
+
+#gyro_cont {
+    float: left;
+    text-align: center;
+    width: 12%;
+    height: 400px;
+}
+
+#battery {
+    margin-top: 10px;
+    //margin-left: 30px;
+    //text-align: center;
+    //left: 20px;
+    transform: rotate(180deg);
+    width: 220px;
+    height: 30px;
+ }
+
+#btcont {
+    float: left;
+    text-align: center;
+    width: 12%;
+    height: 400px;
+}
+.bt-led {
+    height: 50px;
+    width: 50px;
+    color: blue;
+    //background-color: Green;
+    border: 2px;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+    font-size: 16px;
+    margin: 40px 25% 2px 30%;
+    border-radius: 50%;
+    transition: all 0.5s;
+    background: #92c7eb;
+    background-image: url("../img/circle_grey.png");
+    background-size: cover;
+    background-position: center;
+    cursor: pointer;
+}
+.btn-led:hover
+{
+  width: 70px;
+  height: 70px;
+}
+
+#bt-led0 {
+    top: 20px;
+}
+#bt-led1 {
+    top: 120px;
+}
+#bt-led2 {
+    top: 220px;
+}
+#bt-led3 {
+    top: 320px;
+}
+
+
+.mark {
+  left: 0;
+  top: -100px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  //background-color: #2D4671;
+  position: absolute;
+  padding: 0;
+  margin: 0 0;
+}
+
+.dmark {
+    background-color: SaddleBrown;
+    //background-image: url(../img/Arrow-double-up-icon.png);
+    //background-position: center;
+    //background-repeat: no-repeat;
+}
+.rmark {
+    background-color: Teal;
+}
+
+#rmark_motl, #rmark_motr {
+  left: 0;
+  top: -100px;
+  width: 10px;
+  height: 10px;
+  //content: url(../img/Actions-edit-delete-48.png);
+  position: absolute;
+  padding: 0;
+  margin: 0 0;
+}
+
+#rmark_ser {
+  left: 0;
+  top: -100px;
+  width: 128px;
+  height: 128px;
+  position: absolute;
+  padding: 0;
+  margin: 0 0;
+  transform: rotate(0deg);
+}
+
+// ---------- switch -----------
+
+/* -------------------------------------------------------------
+   Pure CSS Toggle Switch with :checked
+https://bl.ocks.org/feo52/7fe0c5100fb2631ab835
+   ---------------------------------------------------------- */
+.toggle-status {
+    display: none;
+}
+.toggle-switch {
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    vertical-align: bottom;
+    cursor: pointer;
+    display: inline-block;
+    position: relative;
+    width:  1.625em; /* calc(1em * 2 - 0.125em * 2 - 0.0625em * 2); */
+    height: 1.000em; /* calc(1em * 1); */
+    box-sizing: border-box;
+    border: solid lightgray 0.125em;
+    transition: border 0.5s;
+}
+.toggle-status:checked + .toggle-switch {
+    border: solid lightgreen 0.125em;
+}
+.toggle-switch::after {
+    content: "";
+    display: inline-block;
+    position: absolute;
+    top:    0.0625em;
+    left:   0.0625em;
+    width:  0.625em; /* calc(1em - 0.125em * 2 - 0.0625em * 2); */
+    height: 0.625em; /* calc(1em - 0.125em * 2 - 0.0625em * 2); */
+    background: lightgray;
+    transition: background 0.5s, left 0.5s;
+}
+.toggle-status:checked + .toggle-switch::after {
+    background: lightgreen;
+    left: 0.6875em; /* calc(1em - 0.125em * 2 - 0.0625em); */
+}
+.toggle-string {
+    line-height: 1;
+}
+/* ------------------------------------------ */
+.toggle-rounded {
+    border-radius: 0.5000em; /* calc(1em / 2); */
+}
+.toggle-rounded::after {
+    border-radius: 0.3125em; /* calc(1em / 2 - 0.125em - 0.0625em); */
+}
+/* ---------------------------------------------
+   Size
+   ------------------------------------------ */
+.toggle-x1 { font-size: 1rem; }
+.toggle-x2 { font-size: 2rem; }
+.toggle-x3 { font-size: 3rem; }
+.toggle-x4 { font-size: 4rem; }
+.toggle-x5 { font-size: 5rem; }
+.toggle-x6 { font-size: 6rem; }
+/* ------------------------------------------ */
+

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<!--
+-->
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+        <link rel="stylesheet" type="text/css" href="css/index.css">
+        <title>Tim remote</title>
+    </head>
+    <body onresize="resize_on(this)">
+        <div id="head2" style="text-align: center;">
+            <h2>Пульт управления мобильной платформой</h2>
+        </div>
+        <div id="butt_block">
+            <span style="margin-top: 10px; margin-left:5%;">УПРАВЛЕНИЕ
+            </span>
+            <span>
+                <input id ="sw_start" class="toggle-status" type="checkbox" onclick="crtrl_on(this)" style="display:none;">
+                <label for="sw_start" class="toggle-switch  toggle-x2 toggle-rounded">
+                </label>
+            </span>
+            <span style="margin-left:27%;">
+                <button id="bt_pwr" onclick="rem_poweroff()">Off</button>
+            </span>
+            <span style="margin-left:32%;"><a id="sett_page"  href="settings.html">НАСТРОЙКИ</a>
+            </span>
+        </div>
+        <div id="stepp_switch">
+            <span style="padding-left: 5%; vertical-align: 40%;">УГОЛ</span>
+            <input id ="sw_st1" class="toggle-status" type="checkbox" style="display:none;">
+            <label for="sw_st1" class="toggle-switch  toggle-x2 toggle-rounded">
+            </label>
+            <span style="vertical-align: 40%;">ВРАЩЕНИЕ</span>
+            <span style="padding-left: 15%;">
+                <meter id="battery" name="battery"
+                min="0" max="100"
+                low="33" high="66" optimum="80"
+                value="30">
+            </span>
+            <span style="padding-left: 15%; vertical-align: 40%;">УГОЛ</span>
+            <input id ="sw_st2" class="toggle-status" type="checkbox" style="display:none;">
+            <label for="sw_st2" class="toggle-switch  toggle-x2 toggle-rounded">
+            </label>
+            <span style="vertical-align: 40%;">ВРАЩЕНИЕ</span>
+        </div>
+        <div id="stepp_block">
+            <div id="stepp1" class="stepps">
+                <div id="stepp1_info">ШД1</div>
+            </div>
+            <div id="btcont">
+                <button id="bt-led0" class="bt-led" onclick="led_switch(this.id)">0</button>
+                <button id="bt-led1" class="bt-led" onclick="led_switch(this.id)">1</button>
+                <button id="bt-led2" class="bt-led" onclick="led_switch(this.id)">2</button>
+                <button id="bt-led3" class="bt-led" onclick="led_switch(this.id)">3</button>
+            </div>
+            <div id="stepp2" class="stepps">
+                <div id="stepp2_info">ШД2</div>
+            </div>
+        </div>
+        <div id="dist_block">
+            <span style="margin-top: 10px; margin-left:5%;">Измерение расстояния</span>
+            <span style="margin-top: 5px;">
+                <input id ="dist_sw" class="toggle-status" type="checkbox" style="display:none;">
+                <label for="dist_sw" class="toggle-switch  toggle-x2 toggle-rounded"></label>                
+            </span>
+        </div>
+        <div id="helm_block">
+            <div id="motors" class="helms">
+                <div id="motors_info">MOTORS</div>
+            </div>
+            <div id="gyro_cont">
+                <p>Гироскоп
+                <br>Выкл/Вкл</p>
+                <input id ="gyro_sw" class="toggle-status" type="checkbox" style="display:none;">
+                <label for="gyro_sw" class="toggle-switch  toggle-x2 toggle-rounded"></label>
+            </div>
+
+            <div id="servo" class="helms">
+                <div id="servo_info">SERVO</div>
+            </div>
+        </div>
+        <script type="text/javascript" src="js/nipplejs.js"></script>
+        <script type="text/javascript" src="js/main.js"></script>
+
+        <span id="mark_st1" class="mark dmark"></span>
+        <span id="mark_st2" class="mark dmark"></span>
+        <span id="mark_mot" class="mark dmark"></span>
+        <span id="mark_ser" class="mark dmark"></span>
+        <span id="rmark_st1" class="mark rmark"></span>
+        <span id="rmark_st2" class="mark rmark"></span>
+        <span>
+            <img id="rmark_motl" src="img/Actions-edit-delete-48.png"/>
+        </span>
+        <span>
+            <img id="rmark_motr" src="img/Actions-edit-delete-48.png"/>
+        </span>
+        <span>
+            <img id="rmark_ser" src="img/arrow-134-128rb.png"/>
+        </span>
+        <div id="diagmsg">?
+        </div>
+    </body>
+</html>
