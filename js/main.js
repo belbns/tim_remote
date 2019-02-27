@@ -310,8 +310,8 @@ function sendToESP(token, newcmd, par1, par2) {
         case 'led':
             st = st + '["' + newcmd + '",' + par1.toString() + ']';
             break;
-        case 'st'
-            st = st + '["' + newcmd + '",' + par2.toString() + ',' + par1.toString() + ']';
+        case 'st':
+            st = st + '["' + newcmd + '",' + par1.toString() + ',' + par2.toString() + ']';
             break;
         case 'echo':
         case 'dist':
