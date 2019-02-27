@@ -282,18 +282,19 @@ websocket.onclose = function() {
 */
 
 function doSend(message) {
-    /*
-    if (websocket.readyState === 1) { // 0 - connecting, 1 - open, 2 - closing, 3 - closed
-        websocket.send(message);
-        writeToScreen("sent message: " + message);
-    }
-    else if (websocket.readyState === 2) {
-        writeToScreen("websocket is in closing process");
-    }
-    else if (websocket.readyState === 0) {
-        writeToScreen("websocket is closed");
-    }
-    */
+      message = String(message);
+
+  if (!message || !characteristicCache) {
+    return;
+  }
+
+  writeToCharacteristic(characteristicCache, message);
+  writeToScreen(message, 'out');
+}
+
+// Записать значение в характеристику
+function writeToCharacteristic(characteristic, data) {
+  characteristic.writeValue(new TextEncoder().encode(data));
 }
 
 function writeToScreen(message) {
