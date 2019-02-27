@@ -282,7 +282,7 @@ websocket.onclose = function() {
 */
 
 function doSend(message) {
-      message = String(message);
+      message = String(message + '\n');
 
   if (!message || !characteristicCache) {
     return;
