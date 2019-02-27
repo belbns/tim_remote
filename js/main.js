@@ -282,7 +282,7 @@ websocket.onclose = function() {
 */
 
 function doSend(message) {
-      message = String(message + '\n');
+      message = String(message);
 
   if (!message || !characteristicCache) {
     return;
@@ -325,7 +325,7 @@ function sendToESP(token, newcmd, par1) {
         st = st + par1.toString();
     }
     st =  st + '}';
-    doSend(st);
+    doSend(st + '\r\n');
     console.log('Send: ' + token + ' ' + newcmd + ' ' + par1);
     console.log(st);
     return true;
