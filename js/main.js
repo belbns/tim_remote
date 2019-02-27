@@ -29,10 +29,10 @@ var ctrlServo = {       // Серво привод
 
 var ctrlStepp = {
     a: {   mode: 'm', state: 's', queue: false, cmd: 's', angle_dst: Math.PI/2, angle_real: Math.PI/2, 
-        turn: 'n', dir: Math.PI/2, dist: 0, token: 'stepp1', info: 'stepp1_info', 
+        turn: 'n', dir: Math.PI/2, dist: 0, token: 'stp1', info: 'stepp1_info', 
         modesw : 'sw_st1', markd: 'mark_st1', markr: 'rmark_st1' },
     b: {   mode: 'm', state: 's', queue: false, cmd: 's', angle_dst: Math.PI/2, angle_real: Math.PI/2, 
-        turn: 'n', dir: Math.PI/2, dist: 0, token: 'stepp2', info: 'stepp2_info', 
+        turn: 'n', dir: Math.PI/2, dist: 0, token: 'stp2', info: 'stepp2_info', 
         modesw : 'sw_st2', markd: 'mark_st2', markr: 'rmark_st2' }  };
 
 var ctrlLeds = [0, 0, 0, 0];
@@ -306,8 +306,8 @@ function writeToScreen(message) {
 function sendToESP(token, newcmd, par1) {
     var st = '{"' + token + '":';
     switch(token) {
-        case 'stepp1':
-        case 'stepp2':
+        case 'stp1':
+        case 'stp2':
         case 'motors':
         case 'leds':
             st = st + '["' + newcmd + '",' + par1.toString() + ']';
@@ -325,7 +325,7 @@ function sendToESP(token, newcmd, par1) {
         st = st + par1.toString();
     }
     st =  st + '}';
-    doSend(st + '\r\n');
+    doSend(st + '\n');
     console.log('Send: ' + token + ' ' + newcmd + ' ' + par1);
     console.log(st);
     return true;
