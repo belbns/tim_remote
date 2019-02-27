@@ -9,6 +9,7 @@ var ctrlMotors = {  // ДПТ
     v_right: 0,         // -- правого мотора
     dir: Math.PI/2,
     dist: 0,
+    id: 'motors',
     token: 'mot',
     info: 'motors_info',
     markd: 'mark_mot',
@@ -21,6 +22,7 @@ var ctrlServo = {       // Серво привод
     angle_real: Math.PI/2,
     dir: 0,
     dist: 0 ,
+    id: 'servo',
     token: 'servo',
     info: 'servo_info',
     markd: 'mark_ser',
@@ -29,10 +31,10 @@ var ctrlServo = {       // Серво привод
 
 var ctrlStepp = {
     a: { num: 0,  mode: 'm', state: 's', queue: false, cmd: 's', angle_dst: Math.PI/2, 
-        angle_real: Math.PI/2, turn: 'n', dir: Math.PI/2, dist: 0, token: 'st', 
+        angle_real: Math.PI/2, turn: 'n', dir: Math.PI/2, dist: 0, id: 'stepp1', token: 'st', 
         info: 'stepp1_info', modesw : 'sw_st1', markd: 'mark_st1', markr: 'rmark_st1' },
     b: { num: 1,  mode: 'm', state: 's', queue: false, cmd: 's', angle_dst: Math.PI/2, 
-        angle_real: Math.PI/2, turn: 'n', dir: Math.PI/2, dist: 0, token: 'st',
+        angle_real: Math.PI/2, turn: 'n', dir: Math.PI/2, dist: 0, id: 'stepp2', token: 'st',
         info: 'stepp2_info', modesw : 'sw_st2', markd: 'mark_st2', markr: 'rmark_st2' }  };
 
 var ctrlLeds = [0, 0, 0, 0];
@@ -352,7 +354,7 @@ function getJoystickPos(cont) {
 };
 
 function jPosDraw(ctrl_j) {
-    var xy = calcContCenter(ctrl_j.token);
+    var xy = calcContCenter(ctrl_j.id);
     var a = ctrl_j.angle_real;
     var mr = document.getElementById(ctrl_j.markr);
     var x = xy['x'] + rmarkR * Math.cos(a);
@@ -369,7 +371,7 @@ function jPosDraw(ctrl_j) {
 }
 
 function jPosDrawServo(ctrl_j) {
-    var xy = calcContCenter(ctrl_j.token);
+    var xy = calcContCenter(ctrl_j.id);
     var a = ctrl_j.angle_real;
     var mr = document.getElementById(ctrl_j.markr);
 
@@ -386,8 +388,8 @@ function jPosDrawServo(ctrl_j) {
 }
 
 function jPosMotDraw(ctrl_j) {
-    var xy = calcContCenter(ctrl_j.token);
-    //var bg = document.getElementById(ctrl_j.token); //bg.style['background-image'] = 'img/Actions-go-previous-48';
+    var xy = calcContCenter(ctrl_j.id);
+    //var bg = document.getElementById(ctrl_j.id); //bg.style['background-image'] = 'img/Actions-go-previous-48';
     var wp = 48;
     var hp = 48;
     var mr = document.getElementById(ctrl_j.markr); // правый мотор
@@ -486,7 +488,7 @@ function motorCommand(ctrl_m) {
             else {
                 ctrl_m.cmd = 's';
             }
-            document.getElementById(ctrl_m.token).style['background-image'] = 'none';
+            document.getElementById(ctrl_m.id).style['background-image'] = 'none';
         }
     }
 
@@ -494,7 +496,7 @@ function motorCommand(ctrl_m) {
         if ( sendToESP(ctrl_m.token, 's', 0, 0) ) {
             ctrl_m.cmd = 's';
             ctrl_m.v_dst = 0;
-            document.getElementById(ctrl_m.token).style['background-image'] = 'none';
+            document.getElementById(ctrl_m.id).style['background-image'] = 'none';
         }
     }
 
