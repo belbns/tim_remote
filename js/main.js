@@ -9,7 +9,7 @@ var ctrlMotors = {  // ДПТ
     v_right: 0,         // -- правого мотора
     dir: Math.PI/2,
     dist: 0,
-    token: 'motors',
+    token: 'mot',
     info: 'motors_info',
     markd: 'mark_mot',
     markl: 'rmark_motl',
@@ -28,12 +28,12 @@ var ctrlServo = {       // Серво привод
 }
 
 var ctrlStepp = {
-    a: {   mode: 'm', state: 's', queue: false, cmd: 's', angle_dst: Math.PI/2, angle_real: Math.PI/2, 
-        turn: 'n', dir: Math.PI/2, dist: 0, token: 'stp1', info: 'stepp1_info', 
-        modesw : 'sw_st1', markd: 'mark_st1', markr: 'rmark_st1' },
-    b: {   mode: 'm', state: 's', queue: false, cmd: 's', angle_dst: Math.PI/2, angle_real: Math.PI/2, 
-        turn: 'n', dir: Math.PI/2, dist: 0, token: 'stp2', info: 'stepp2_info', 
-        modesw : 'sw_st2', markd: 'mark_st2', markr: 'rmark_st2' }  };
+    a: { num: 0,  mode: 'm', state: 's', queue: false, cmd: 's', angle_dst: Math.PI/2, 
+        angle_real: Math.PI/2, turn: 'n', dir: Math.PI/2, dist: 0, token: 'st', 
+        info: 'stepp1_info', modesw : 'sw_st1', markd: 'mark_st1', markr: 'rmark_st1' },
+    b: { num: 1,  mode: 'm', state: 's', queue: false, cmd: 's', angle_dst: Math.PI/2, 
+        angle_real: Math.PI/2, turn: 'n', dir: Math.PI/2, dist: 0, token: 'st',
+        info: 'stepp2_info', modesw : 'sw_st2', markd: 'mark_st2', markr: 'rmark_st2' }  };
 
 var ctrlLeds = [0, 0, 0, 0];
 
@@ -303,14 +303,15 @@ function writeToScreen(message) {
 }
 
 
-function sendToESP(token, newcmd, par1) {
+function sendToESP(token, newcmd, par1, par2) {
     var st = '{"' + token + '":';
     switch(token) {
-        case 'stp1':
-        case 'stp2':
-        case 'motors':
-        case 'leds':
+        case 'mot':
+        case 'led':
             st = st + '["' + newcmd + '",' + par1.toString() + ']';
+            break;
+        case 'st'
+            st = st + '["' + newcmd + '",' + par2.toString() + ',' + par1.toString() + ']';
             break;
         case 'echo':
         case 'dist':
@@ -318,7 +319,6 @@ function sendToESP(token, newcmd, par1) {
             break;
         case 'servo':
         case 'pause':
-        case 'remote':
         case 'check':
         case 'pwroff':
         case 'stop':
@@ -476,7 +476,7 @@ function motorCommand(ctrl_m) {
 
     function mTurnCancel() {
         var cmd = 'n';
-        if ( sendToESP(ctrl_m.token, 'n', ctrl_m.v_dst) ) {
+        if ( sendToESP(ctrl_m.token, 'n', ctrl_m.v_dst, 0) ) {
             if (ctrl_m.v_dst > 0) {
                 ctrl_m.cmd = 'f';
             }
@@ -491,7 +491,7 @@ function motorCommand(ctrl_m) {
     }
 
     function mStop() {
-        if ( sendToESP(ctrl_m.token, 's', 0) ) {
+        if ( sendToESP(ctrl_m.token, 's', 0, 0) ) {
             ctrl_m.cmd = 's';
             ctrl_m.v_dst = 0;
             document.getElementById(ctrl_m.token).style['background-image'] = 'none';
@@ -531,7 +531,7 @@ function motorCommand(ctrl_m) {
                         mStop();
                     }
                     else {
-                        if (sendToESP(ctrl_m.token, cmd, v)) {
+                        if (sendToESP(ctrl_m.token, cmd, v, 0)) {
                             ctrl_m.cmd = cmd;
                             ctrl_m.v_dst = v;
                         }
@@ -560,7 +560,7 @@ function motorCommand(ctrl_m) {
                         mStop();
                     }
                     else {
-                        if (sendToESP(ctrl_m.token, cmd, v)) {
+                        if (sendToESP(ctrl_m.token, cmd, v, 0)) {
                             ctrl_m.cmd = cmd;
                             ctrl_m.v_dst = v;
                         }
@@ -573,7 +573,7 @@ function motorCommand(ctrl_m) {
                 mTurnCancel();
             }
             else {
-                if (sendToESP(ctrl_m.token, 'l', 0)) {
+                if (sendToESP(ctrl_m.token, 'l', 0, 0)) {
                     ctrl_m.cmd = 'l';
                 }                
             }
@@ -583,7 +583,7 @@ function motorCommand(ctrl_m) {
                 mTurnCancel();
             }
             else {
-                if (sendToESP(ctrl_m.token, 'r', 0)) {
+                if (sendToESP(ctrl_m.token, 'r', 0, 0)) {
                     ctrl_m.cmd = 'r';
                 }                
             }
@@ -608,7 +608,7 @@ function steppCommand(ctrl_st) {
                 cmd = 's';
         }
 
-        if (sendToESP(ctrl_st.token, cmd, param1)) {
+        if (sendToESP(ctrl_st.token, cmd, param1, ctrl_st.num)) {
             ctrl_st.cmd = cmd;
             ctrl_st.angle_dst = Math.PI / 2;
         }
@@ -626,7 +626,7 @@ function steppCommand(ctrl_st) {
                     else {
                         cmd = 'l';
                     }
-                    if (sendToESP(ctrl_st.token, cmd, 0))
+                    if (sendToESP(ctrl_st.token, cmd, 0, ctrl_st.num))
                     {
                         ctrl_st.cmd = cmd;
                     }
@@ -641,7 +641,7 @@ function steppCommand(ctrl_st) {
                     else {
                         cmd = 'r';
                     }
-                    if (sendToESP(ctrl_st.token, cmd, 0))
+                    if (sendToESP(ctrl_st.token, cmd, 0, ctrl_st.num))
                     {
                         ctrl_st.cmd = cmd;
                     }
@@ -656,7 +656,7 @@ function steppCommand(ctrl_st) {
             }
             param1 = Math.round(an * 512 / (2 * Math.PI));  // пересчитываем в шаги ШД
             cmd = 'a';
-            if (sendToESP(ctrl_st.token, cmd, param1))
+            if (sendToESP(ctrl_st.token, cmd, param1, ctrl_st.num))
             {
                 ctrl_st.cmd = cmd;
                 ctrl_st.angle_dst = r_angle;
@@ -693,7 +693,7 @@ function servoCommand(ctrl_se) {
         angle = angleLimit(ctrl_se.dir);
     }
 
-    if (sendToESP(ctrl_se.token, 's', servoAngle(angle))) {
+    if (sendToESP(ctrl_se.token, 's', servoAngle(angle), 0)) {
         ctrl_se.angle_dst = angle;
     }
 };
@@ -802,7 +802,6 @@ function led_switch(clicked_id) {
     if (l > 2) {
         l = 0;
     }
-    var mask = 1 << led;
     var st = "";
     var cmd = "";
     switch (l) {
@@ -820,7 +819,7 @@ function led_switch(clicked_id) {
     }
 
 
-    if ( sendToESP('leds', cmd, mask) ) {
+    if ( sendToESP('led', cmd, led, 0) ) {
         butt.style['background-image'] = st;
         ctrlLeds[led] = l;
     }
