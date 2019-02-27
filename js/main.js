@@ -26,40 +26,7 @@ var ctrlServo = {       // Серво привод
     markd: 'mark_ser',
     markr: 'rmark_ser'
 }
-/*
-var ctrlStepp1 = {  // ШД1
-    mode: 'm',          // текущий режим <- МП
-    state: 's',         // теущий статус <- МП ("v"|"s")
-    queue: false,       // наличие команд ШД1 в очереди <- МП
-    cmd: 's',           // последняя команда -> МП ("r"|"l"|"s"|"h"|"a")
-    angle_dst: Math.PI/2,       // заданное значение угла -> МП (-511..511, для команды "a")
-    angle_real: Math.PI/2,      // текущее значение угла <- МП
-    dir: Math.PI/2,             // последнее направление джойстика
-    dist: 0,             // последняя дистанция джойстика
-    token: 'stepp1',
-    info: 'stepp1_info',
-    modesw: 'sw_st1',
-    markd: 'mark_st1',
-    markr: 'rmark_st1'
-};
 
-var ctrlStepp2 = {  // ШД2
-    mode: 'm',
-    state: 's',
-    queue: false,
-    cmd: 's',
-    angle_dst: Math.PI/2,
-    angle_real: Math.PI/2,
-    turn: 'n',
-    dir: Math.PI/2,
-    dist: 0,
-    token: 'stepp2',
-    info: 'stepp2_info',
-    modesw : 'sw_st2',
-    markd: 'mark_st2',
-    markr: 'rmark_st2'
-};
-*/
 var ctrlStepp = {
     a: {   mode: 'm', state: 's', queue: false, cmd: 's', angle_dst: Math.PI/2, angle_real: Math.PI/2, 
         turn: 'n', dir: Math.PI/2, dist: 0, token: 'stepp1', info: 'stepp1_info', 
@@ -91,6 +58,144 @@ if (!remote_port) {
 }
 */
 
+// Кэш объекта выбранного устройства
+let deviceCache = null;
+// Кэш объекта характеристики
+let characteristicCache = null;
+
+// Запустить выбор Bluetooth устройства и подключиться к выбранному
+function connect() {
+    return (deviceCache ? Promise.resolve(deviceCache) :
+        requestBluetoothDevice()).
+        then(device => connectDeviceAndCacheCharacteristic(device)).
+        then(characteristic => startNotifications(characteristic)).
+        catch(error => writeToScreen(error));
+}
+
+// Запрос выбора Bluetooth устройства
+function requestBluetoothDevice() {
+    //
+    writeToScreen('Requesting bluetooth device...');
+
+    return navigator.bluetooth.requestDevice({
+        filters: [{services: [0xFFE0]}],
+    }).
+        then(device => {
+            writeToScreen('"' + device.name + '" bluetooth device selected');
+            deviceCache = device;
+
+            // Добавленная строка
+            deviceCache.addEventListener('gattserverdisconnected',
+                handleDisconnection);
+
+            return deviceCache;
+        });
+}
+
+// Обработчик разъединения
+function handleDisconnection(event) {
+    let device = event.target;
+
+    writeToScreen('"' + device.name +
+        '" bluetooth device disconnected, trying to reconnect...');
+
+    connectDeviceAndCacheCharacteristic(device).
+        then(characteristic => startNotifications(characteristic)).
+        catch(error => log(error));
+}
+
+// Отключиться от подключенного устройства
+function disconnect() {
+    if (deviceCache) {
+        writeToScreen('Disconnecting from "' + deviceCache.name + '" bluetooth device...');
+        deviceCache.removeEventListener('gattserverdisconnected',
+            handleDisconnection);
+
+        if (deviceCache.gatt.connected) {
+            deviceCache.gatt.disconnect();
+            writeToScreen('"' + deviceCache.name + '" bluetooth device disconnected');
+        }
+        else {
+            writeToScreen('"' + deviceCache.name +
+                '" bluetooth device is already disconnected');
+        }
+    }
+
+     // Добавленное условие
+    if (characteristicCache) {
+        characteristicCache.removeEventListener('characteristicvaluechanged',
+            handleCharacteristicValueChanged);
+        characteristicCache = null;
+    }
+
+    deviceCache = null;
+}
+
+// Подключение к определенному устройству, получение сервиса и характеристики
+function connectDeviceAndCacheCharacteristic(device) {
+    //
+    if (device.gatt.connected && characteristicCache) {
+        return Promise.resolve(characteristicCache);
+    }
+
+    writeToScreen('Connecting to GATT server...');
+
+    return device.gatt.connect().
+        then(server => {
+            writeToScreen('GATT server connected, getting service...');
+
+            return server.getPrimaryService(0xFFE0);
+        }).
+        then(service => {
+            writeToScreen('Service found, getting characteristic...');
+
+            return service.getCharacteristic(0xFFE1);
+        }).
+        then(characteristic => {
+            writeToScreen('Characteristic found');
+            characteristicCache = characteristic;
+
+            return characteristicCache;
+        });
+}
+
+// Включение получения уведомлений об изменении характеристики
+function startNotifications(characteristic) {
+    //
+    writeToScreen('Starting notifications...');
+
+    return characteristic.startNotifications().
+        then(() => {
+            writeToScreen('Notifications started');
+            // Добавленная строка
+            characteristic.addEventListener('characteristicvaluechanged',
+                handleCharacteristicValueChanged);
+        });
+}
+
+// Получение данных
+function handleCharacteristicValueChanged(event) {
+  let value = new TextDecoder().decode(event.target.value);
+  writeToScreen(value, 'in');
+}
+
+function crtrl_on(sw) {
+    if (sw.checked) {
+        // connect to BLE
+        connect();
+        jPosDraw(ctrlStepp.a);
+        jPosDraw(ctrlStepp.b);
+        jPosMotDraw(ctrlMotors);
+        jPosDrawServo(ctrlServo);
+        ctrlFlag = true;
+    }
+    else {
+        // disconnect();
+        ctrlFlag = false;
+    }
+}
+
+/*
 var ws_connected = false;
 
 var wsUri = "ws://" + remote_ip + ":" + remote_port;
@@ -103,7 +208,8 @@ websocket.onopen = function(evt) {
     ws_connected = true;
     sendToESP('remote', 's', ws_connected);
 };
-
+*/
+/*
 websocket.onmessage = function(evt) {
     //alert(evt.data);
     console.log(evt.data);
@@ -126,21 +232,8 @@ websocket.onmessage = function(evt) {
         ctrlServo.angle_real = (event.servo - 18) * Math.PI / 18;
         jPosDrawServo(ctrlServo);
     }
-    /*
-    if(event.hasOwnProperty('stepp1')) {
-        if (event.stepp1[0] === 'e') {
-            ctrlStepp1.queue = false;
-        }
-        else {
-            ctrlStepp1.queue = true;   
-        }
-        ctrlStepp1.state = event.stepp1[1];
-        ctrlStepp1.mode = event.stepp1[2];
-        ctrlStepp1.turns = event.stepp1[3];
-        ctrlStepp1.angle_real = event.stepp1[4] * Math.PI / 256; // A * 2 * PI /512
-        jPosDraw(ctrlStepp1);
-    }
-    */
+    
+
     if(event.hasOwnProperty('stepp1')) {
         var st = ctrlStepp.a;
         if (event.stepp1[0] === 'e') {
@@ -174,6 +267,9 @@ websocket.onmessage = function(evt) {
     }
 };
 
+*/
+
+/*
 websocket.onerror = function(evt) {
     writeToScreen("*** Websocket error!");
     //websocket.close();
@@ -183,8 +279,10 @@ websocket.onclose = function() {
     ws_connected = false;
     writeToScreen("Disconnected");
 };
+*/
 
 function doSend(message) {
+    /*
     if (websocket.readyState === 1) { // 0 - connecting, 1 - open, 2 - closing, 3 - closed
         websocket.send(message);
         writeToScreen("sent message: " + message);
@@ -195,6 +293,7 @@ function doSend(message) {
     else if (websocket.readyState === 0) {
         writeToScreen("websocket is closed");
     }
+    */
 }
 
 function writeToScreen(message) {
@@ -693,18 +792,6 @@ function calcContCenter(cont) {
     return centerXY;
 }
 
-function crtrl_on(sw) {
-	if (sw.checked) {
-        jPosDraw(ctrlStepp.a);
-        jPosDraw(ctrlStepp.b);
-        jPosMotDraw(ctrlMotors);
-        jPosDrawServo(ctrlServo);
-        ctrlFlag = true;
-	}
-    else {
-        ctrlFlag = false;
-    }
-}
 
 function led_switch(clicked_id) {
     var butt = document.getElementById(clicked_id);
