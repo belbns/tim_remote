@@ -184,9 +184,21 @@ function handleCharacteristicValueChanged(event) {
     var event = JSON.parse(value);
     if (event.hasOwnProperty('ms')) {
         ctrlMotors.state = event.ms[0];
-        ctrlMotors.v_real = event.ms[1];
-        ctrlMotors.v_left = event.ms[2];
-        ctrlMotors.v_right = event.ms[3];
+        var vv = event.ms[1];
+        if (vv > 3) {
+            vv = -(vv - 4);
+        }
+        ctrlMotors.v_real = vv;
+        vv = event.ms[2];
+        if (vv > 3) {
+            vv = -(vv - 4);
+        }
+        ctrlMotors.v_left = vv;
+        vv = event.ms[3];
+        if (vv > 3) {
+            vv = -(vv - 4);
+        }
+        ctrlMotors.v_right = vv;
         jPosMotDraw(ctrlMotors)
     }
     else if (event.hasOwnProperty('mq')) {
@@ -260,7 +272,11 @@ function sendToESP(token, newcmd, par1, devnum) {
     var st = '{"' + token + '":';
     switch(token) {
         case 'mot':
-            st = st + '["' + newcmd + '",' + par1.toString() + ']';
+            var p1 = par1;
+            if (par1 < 0) {
+                p1 = 4 - par1;
+            }
+            st = st + '["' + newcmd + '",' + p1.toString() + ']';
             break;
         case 'led':
             st = st + '[' + devnum.toString() + ',"' + newcmd + '"]';
