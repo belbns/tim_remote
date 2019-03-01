@@ -183,10 +183,10 @@ function handleCharacteristicValueChanged(event) {
 
     var event = JSON.parse(value);
     if (event.hasOwnProperty('ms')) {
-        ctrlMotors.state = event.motors[0];
-        ctrlMotors.v_real = event.motors[1];
-        ctrlMotors.v_left = event.motors[2];
-        ctrlMotors.v_right = event.motors[3];
+        ctrlMotors.state = event.ms[0];
+        ctrlMotors.v_real = event.ms[1];
+        ctrlMotors.v_left = event.ms[2];
+        ctrlMotors.v_right = event.ms[3];
         jPosMotDraw(ctrlMotors)
     }
     else if (event.hasOwnProperty('mq')) {
@@ -205,7 +205,7 @@ function handleCharacteristicValueChanged(event) {
         ctrlStepp[event.sv[0]].turns = event.sv[1];
         // A * 2 * PI /512 + PI/2
         ctrlStepp[event.sv[0]].angle_real = event.sv[2] * Math.PI / 256 + Math.PI / 2;
-        jPosDraw(st);
+        jPosDraw(ctrlStepp[event.sv[0]]);
     }
     else if (event.hasOwnProperty('sq')) {
         ctrlStepp[event.sq[0]].queue = event.sq[1];
