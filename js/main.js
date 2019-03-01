@@ -247,9 +247,12 @@ function writeToCharacteristic(characteristic, data) {
     characteristic.writeValue(new TextEncoder().encode(data));
 }
 
-function writeToScreen(message) {
+function writeToScreen(message, type ='') {
     var outputEl = document.getElementById('diagmsg');
-    outputEl.innerHTML = message;
+    //outputEl.innerHTML = message;
+      outputEl.insertAdjacentHTML('beforeend',
+      '<div' + (type ? ' class="' + type + '"' : '') + '>' + message + '</div>');
+
 }
 
 

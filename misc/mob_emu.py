@@ -24,7 +24,6 @@ def parse_inbuf(buf):
 	pa_cmd = json.loads(buf)
 	if 'mot' in pa_cmd:
 		mt = pa_cmd['mot']
-		print "mot: "+ mt[0] + " " + str(mt[1])
 		nstate = mt[0]
 		if (mt[0] == "f") or (mt[0] == "b"):
 			motors['vall'] = motors['vleft'] = motors['vright'] = mt[1]
@@ -32,10 +31,8 @@ def parse_inbuf(buf):
 			motors['vall'] = motors['vleft'] = motors['vriight'] = 0
 		elif mt[0] == "r":
 			motors['vright'] = 0
-			#print "vright= " + str(motors['vright'])
 		elif mt[0] == "l":
 			motors['vleft'] = 0
-			#print "vleft= " + str(motors['vleft'])
 		elif mt[0] == "n":
 			motors['vleft'] = motors['vright'] = motors['vall']
 			if motors['vall'] > 0:
@@ -56,9 +53,9 @@ def parse_inbuf(buf):
 
 	elif 'st' in pa_cmd:
 		stp = pa_cmd['st']
-		stnum = stp[2]
-		stepp[stnum]['angle'] = stp[1]
-		stepp[stnum]['state'] = stp[0]
+		stnum = stp[0]
+		stepp[stnum]['angle'] = stp[2]
+		stepp[stnum]['state'] = stp[1]
 		st = '{"ss":[' + str(stnum) + ',"s","m"]}\n'
 		print '>>> ' + st
 		ser.write(st.encode('ascii', 'ignore'))
