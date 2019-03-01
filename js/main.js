@@ -200,13 +200,16 @@ function handleCharacteristicValueChanged(event) {
     else if (event.hasOwnProperty('ss')) {
         ctrlStepp[event.ss[0]].state = event.ss[1];
         ctrlStepp[event.ss[0]].mode = event.ss[2];
+    }
     else if (event.hasOwnProperty('sv')) {
         ctrlStepp[event.sv[0]].turns = event.sv[1];
         // A * 2 * PI /512 + PI/2
         ctrlStepp[event.sv[0]].angle_real = event.sv[2] * Math.PI / 256 + Math.PI / 2;
         jPosDraw(st);
+    }
     else if (event.hasOwnProperty('sq')) {
         ctrlStepp[event.sq[0]].queue = event.sq[1];
+    }
     else if (event.hasOwnProperty('adc')) {
         adc_val[event.adc[0]] = event.adc[1];
     }
