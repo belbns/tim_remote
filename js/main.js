@@ -29,19 +29,20 @@ var ctrlServo = {       // Серво привод
     markr: 'rmark_ser'
 }
 
-var ctrlStepp = {
-    a: { num: 0,  mode: 'm', state: 's', queue: false, cmd: 's', angle_dst: Math.PI/2, 
+var ctrlStepp = [
+    { num: 0,  mode: 'm', state: 's', queue: false, cmd: 's', angle_dst: Math.PI/2, 
         angle_real: Math.PI/2, turn: 'n', dir: Math.PI/2, dist: 0, id: 'stepp1', token: 'st', 
-        info: 'stepp1_info', modesw : 'sw_st1', markd: 'mark_st1', markr: 'rmark_st1' },
-    b: { num: 1,  mode: 'm', state: 's', queue: false, cmd: 's', angle_dst: Math.PI/2, 
+        info: 'stepp1_info', modesw : 'sw_st1', markd: 'mark_st1', markr: 'rmark_st1' 
+    },
+    { num: 1,  mode: 'm', state: 's', queue: false, cmd: 's', angle_dst: Math.PI/2, 
         angle_real: Math.PI/2, turn: 'n', dir: Math.PI/2, dist: 0, id: 'stepp2', token: 'st',
-        info: 'stepp2_info', modesw : 'sw_st2', markd: 'mark_st2', markr: 'rmark_st2' }  };
+        info: 'stepp2_info', modesw : 'sw_st2', markd: 'mark_st2', markr: 'rmark_st2' 
+    } ];
 
 var ctrlLeds = [0, 0, 0, 0];
 
-var remote_ip = "192.168.4.22";
-//var remote_ip = "127.0.0.1";
-var remote_port = 2012;
+var adc_val = [0, 0, 0, 0];
+
 
 /*
 var storage = window.localStorage;
@@ -177,126 +178,70 @@ function startNotifications(characteristic) {
 
 // Получение данных
 function handleCharacteristicValueChanged(event) {
-  let value = new TextDecoder().decode(event.target.value);
-  writeToScreen(value, 'in');
+    let value = new TextDecoder().decode(event.target.value);
+    writeToScreen(value, 'in');
+
+    var event = JSON.parse(value);
+    if (event.hasOwnProperty('ms')) {
+        ctrlMotors.state = event.motors[0];
+        ctrlMotors.v_real = event.motors[1];
+        ctrlMotors.v_left = event.motors[2];
+        ctrlMotors.v_right = event.motors[3];
+        jPosMotDraw(ctrlMotors)
+    }
+    else if (event.hasOwnProperty('mq')) {
+        ctrlMotors.queue = event.mq;
+
+    }
+    else if(event.hasOwnProperty('servo')) {
+        ctrlServo.angle_real = (event.servo - 18) * Math.PI / 18;
+        jPosDrawServo(ctrlServo);
+    }
+    else if (event.hasOwnProperty('ss')) {
+        ctrlStepp[event.ss[0]].state = event.ss[1];
+        ctrlStepp[event.ss[0]].mode = event.ss[2];
+    else if (event.hasOwnProperty('sv')) {
+        ctrlStepp[event.sv[0]].turns = event.sv[1];
+        // A * 2 * PI /512 + PI/2
+        ctrlStepp[event.sv[0]].angle_real = event.sv[2] * Math.PI / 256 + Math.PI / 2;
+        jPosDraw(st);
+    else if (event.hasOwnProperty('sq')) {
+        ctrlStepp[event.sq[0]].queue = event.sq[1];
+    else if (event.hasOwnProperty('adc')) {
+        adc_val[event.adc[0]] = event.adc[1];
+    }
+
 }
 
 function crtrl_on(sw) {
     if (sw.checked) {
         // connect to BLE
         connect();
-        jPosDraw(ctrlStepp.a);
-        jPosDraw(ctrlStepp.b);
+        jPosDraw(ctrlStepp[0]);
+        jPosDraw(ctrlStepp[1]);
         jPosMotDraw(ctrlMotors);
         jPosDrawServo(ctrlServo);
         ctrlFlag = true;
     }
     else {
-        // disconnect();
+        disconnect();
         ctrlFlag = false;
     }
 }
 
-/*
-var ws_connected = false;
-
-var wsUri = "ws://" + remote_ip + ":" + remote_port;
-
-var websocket = new WebSocket(wsUri);
-
-websocket.onopen = function(evt) {
-    writeToScreen("Connected");
-    //doSend("{'ready':true}");
-    ws_connected = true;
-    sendToESP('remote', 's', ws_connected);
-};
-*/
-/*
-websocket.onmessage = function(evt) {
-    //alert(evt.data);
-    console.log(evt.data);
-    writeToScreen(evt.data);
-    var event = JSON.parse(evt.data);
-    if(event.hasOwnProperty('motors')) {
-        if (event.motors[0] === 'e') {
-            ctrlMotors.queue = false;
-        }
-        else {
-            ctrlMotors.queue = true;   
-        }
-        ctrlMotors.state = event.motors[1];
-        ctrlMotors.v_real = event.motors[2];
-        ctrlMotors.v_left = event.motors[3];
-        ctrlMotors.v_right = event.motors[4];
-        jPosMotDraw(ctrlMotors)
-    }
-    if(event.hasOwnProperty('servo')) {
-        ctrlServo.angle_real = (event.servo - 18) * Math.PI / 18;
-        jPosDrawServo(ctrlServo);
-    }
-    
-
-    if(event.hasOwnProperty('stepp1')) {
-        var st = ctrlStepp.a;
-        if (event.stepp1[0] === 'e') {
-            st.queue = false;
-        }
-        else {
-            st.queue = true;   
-        }
-        st.state = event.stepp1[1];
-        st.mode = event.stepp1[2];
-        st.turns = event.stepp1[3];
-        // A * 2 * PI /512 + PI/2
-        st.angle_real = event.stepp1[4] * Math.PI / 256 + Math.PI / 2;
-        jPosDraw(st);
-    }
-
-    if(event.hasOwnProperty('stepp2')) {
-        var st = ctrlStepp.b;
-        if (event.stepp2[0] === 'e') {
-            st.queue = false;
-        }
-        else {
-            st.queue = true;   
-        }
-        st.state = event.stepp2[1];
-        st.mode = event.stepp2[2];
-        st.turns = event.stepp2[3];
-        // A * 2 * PI /512 + PI/2
-        st.angle_real = event.stepp2[4] * Math.PI / 256 + Math.PI / 2;
-        jPosDraw(st);
-    }
-};
-
-*/
-
-/*
-websocket.onerror = function(evt) {
-    writeToScreen("*** Websocket error!");
-    //websocket.close();
-};
-
-websocket.onclose = function() { 
-    ws_connected = false;
-    writeToScreen("Disconnected");
-};
-*/
 
 function doSend(message) {
-      message = String(message);
-
-  if (!message || !characteristicCache) {
-    return;
-  }
-
-  writeToCharacteristic(characteristicCache, message);
-  writeToScreen(message, 'out');
+    message = String(message);
+    if (!message || !characteristicCache) {
+        return;
+    }
+    writeToCharacteristic(characteristicCache, message);
+    writeToScreen(message, 'out');
 }
 
 // Записать значение в характеристику
 function writeToCharacteristic(characteristic, data) {
-  characteristic.writeValue(new TextEncoder().encode(data));
+    characteristic.writeValue(new TextEncoder().encode(data));
 }
 
 function writeToScreen(message) {
@@ -305,15 +250,17 @@ function writeToScreen(message) {
 }
 
 
-function sendToESP(token, newcmd, par1, par2) {
+function sendToESP(token, newcmd, par1, devnum) {
     var st = '{"' + token + '":';
     switch(token) {
         case 'mot':
-        case 'led':
             st = st + '["' + newcmd + '",' + par1.toString() + ']';
             break;
+        case 'led':
+            st = st + '[' + devnum.toString() + ',"' + newcmd + '"]';
+            break;
         case 'st':
-            st = st + '["' + newcmd + '",' + par1.toString() + ',' + par2.toString() + ']';
+            st = st + '[' + devnum.toString() + ',"' + newcmd + '",' + par1.toString() + ']';
             break;
         case 'echo':
         case 'dist':
@@ -709,15 +656,15 @@ var joystickStepp1 = nipplejs.create({
     size: 120
 });
 joystickStepp1.on('move', function (evt, nipple) {
-    ctrlStepp.a.dir = nipple.angle.radian;
-    ctrlStepp.a.dist = nipple.distance;
+    ctrlStepp[0].dir = nipple.angle.radian;
+    ctrlStepp[0].dist = nipple.distance;
 });
 joystickStepp1.on('end', function () {
     var outputEl = document.getElementById('stepp1_info');
-    outputEl.innerHTML = 'dir=' + ctrlStepp.a.dir.toFixed(4) + ' dist=' + ctrlStepp.a.dist.toFixed(4);
+    outputEl.innerHTML = 'dir=' + ctrlStepp[0].dir.toFixed(4) + ' dist=' + ctrlStepp[0].dist.toFixed(4);
     if (ctrlFlag) {
-        steppCommand(ctrlStepp.a);
-        jPosDraw(ctrlStepp.a);
+        steppCommand(ctrlStepp[0]);
+        jPosDraw(ctrlStepp[0]);
     }
 });
 
@@ -729,15 +676,15 @@ var joystickStepp2 = nipplejs.create({
     size: 120
 });
 joystickStepp2.on('move', function (evt, nipple) {
-    ctrlStepp.b.dir = nipple.angle.radian;
-    ctrlStepp.b.dist = nipple.distance;
+    ctrlStepp[1].dir = nipple.angle.radian;
+    ctrlStepp[1].dist = nipple.distance;
 });
 joystickStepp2.on('end', function () {
     var outputEl = document.getElementById('stepp2_info');
-    outputEl.innerHTML = 'dir=' + ctrlStepp.b.dir.toFixed(0) + ' dist=' + ctrlStepp.b.dist.toFixed(0);
+    outputEl.innerHTML = 'dir=' + ctrlStepp[1].dir.toFixed(0) + ' dist=' + ctrlStepp[1].dist.toFixed(0);
     if (ctrlFlag) {
-        steppCommand(ctrlStepp.b);
-        jPosDraw(ctrlStepp.b);
+        steppCommand(ctrlStepp[1]);
+        jPosDraw(ctrlStepp[1]);
     }
 });
 
@@ -821,7 +768,7 @@ function led_switch(clicked_id) {
     }
 
 
-    if ( sendToESP('led', cmd, led, 0) ) {
+    if ( sendToESP('led', cmd, 0, led) ) {
         butt.style['background-image'] = st;
         ctrlLeds[led] = l;
     }

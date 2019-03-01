@@ -45,36 +45,38 @@ def parse_inbuf(buf):
 			else:
 				nstate = "s"
 		motors['state'] = nstate
-		st = '{"ms":["' + nstate + '",' + str(motors['vall']) + ',' + str(motors['vleft']) + ',' + str(motors['vright']) + ']}\n'
+		st = '{"ms":["' + nstate + '",' + str(motors['vall']) + ',' + str(motors['vleft']) + \
+			',' + str(motors['vright']) + ']}\n'
 		print '>>> ' + st
-		ser.write(st)
+		ser.write(st.encode('ascii', 'ignore'))
 		time.sleep(0.01)
 		st = '{"mq":' + str(motors['queue']) + '}\n'
 		print '>>> ' + st
-		ser.write(st)
+		ser.write(st.encode('ascii', 'ignore'))
 
 	elif 'st' in pa_cmd:
 		stp = pa_cmd['st']
 		stnum = stp[2]
 		stepp[stnum]['angle'] = stp[1]
 		stepp[stnum]['state'] = stp[0]
-		st = '{"sts":[' + str(stnum) + ',"s","m"]}\n'
+		st = '{"ss":[' + str(stnum) + ',"s","m"]}\n'
 		print '>>> ' + st
-		ser.write(st)
+		ser.write(st.encode('ascii', 'ignore'))
 		time.sleep(0.01)
-		st = '{"stv":[' + str(stepp[stnum]['turns']) + ',' + str(stepp[stnum]['angle']) + ']}\n'
+		st = '{"sv":[' + str(stnum) + ',' + str(stepp[stnum]['turns']) + \
+			',' + str(stepp[stnum]['angle']) + ']}\n'
 		print '>>> ' + st
-		ser.write(st)
+		ser.write(st.encode('ascii', 'ignore'))
 		time.sleep(0.01)
-		st = '{"stq":' + str(stepp[stnum]['queue']) + '}\n'
+		st = '{"sq":[' + str(stnum) + ',' + str(stepp[stnum]['queue']) + ']}\n'
 		print '>>> ' + st
-		ser.write(st)
+		ser.write(st.encode('ascii', 'ignore'))
 
 	elif 'servo' in pa_cmd:
 		servo = pa_cmd['servo']
-		st = '{"servo":' + str(servo) + '}\n'
+		st = u'{"servo":' + str(servo) + '}\n'
 		print '>>> ' + st
-		ser.write(st)
+		ser.write(st.encode('ascii', 'ignore'))
 
 
 ser = serial.Serial(dev, speed, timeout = 1)
