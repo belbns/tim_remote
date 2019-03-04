@@ -113,7 +113,6 @@ html, body {
 }
 
 #battery {
-    //margin-top: 10px;
     transform: rotate(180deg);
     width: 220px;
     height: 40px;
