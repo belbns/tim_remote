@@ -25,15 +25,13 @@ def parse_inbuf(buf):
 	if 'mot' in pa_cmd:
 		mt = pa_cmd['mot']
 		nstate = mt[0]
-		if (mt[0] == "f") or (mt[0] == "b"):
+		if (nstate == "f") or (nstate == "b"):
 			motors['vall'] = motors['vleft'] = motors['vright'] = mt[1]
-		elif mt[0] == "s":
-			motors['vall'] = motors['vleft'] = motors['vriight'] = 0
-		elif mt[0] == "r":
+		elif nstate == "r":
 			motors['vright'] = 0
-		elif mt[0] == "l":
+		elif nstate == "l":
 			motors['vleft'] = 0
-		elif mt[0] == "n":
+		elif nstate == "n":
 			motors['vleft'] = motors['vright'] = motors['vall']
 			if motors['vall'] > 0:
 				nstate = "f"
@@ -41,6 +39,9 @@ def parse_inbuf(buf):
 				nstate = "b"
 			else:
 				nstate = "s"
+		else:	# nstate == "s":
+			motors['vall'] = motors['vleft'] = motors['vriight'] = 0
+			
 		motors['state'] = nstate
 		st = '{"ms":["' + nstate + '",' + str(motors['vall']) + ',' + str(motors['vleft']) + \
 			',' + str(motors['vright']) + ']}\n'

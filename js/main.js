@@ -43,7 +43,6 @@ var ctrlLeds = [0, 0, 0, 0];
 
 var adc_val = [0, 0, 0, 0];
 
-const joystickSize = 160;
 /*
 var storage = window.localStorage;
 
@@ -302,6 +301,7 @@ function sendToESP(token, newcmd, par1, devnum) {
     return true;
 };
 
+const joystickSize = 160;
 var markR = joystickSize / 2 - 3;
 var markD = joystickSize / 2 + 3;
 
@@ -457,7 +457,7 @@ function motorCommand(ctrl_m) {
             else {
                 ctrl_m.cmd = 's';
             }
-            document.getElementById(ctrl_m.id).style['background-image'] = 'none';
+            //document.getElementById(ctrl_m.id).style['background-image'] = 'none';
         }
     }
 
@@ -465,15 +465,14 @@ function motorCommand(ctrl_m) {
         if ( sendToESP(ctrl_m.token, 's', 0, 0) ) {
             ctrl_m.cmd = 's';
             ctrl_m.v_dst = 0;
-            document.getElementById(ctrl_m.id).style['background-image'] = 'none';
+            //document.getElementById(ctrl_m.id).style['background-image'] = 'none';
         }
     }
 
     var cmd = 's';
-    var param1 = 0;
     var v = 0;
     if (ctrl_m.dist < (joystickSize / 2 - 10)) { // нажатие в центре - стоп или отмена поворота
-        if ((ctrl_m.cmd === 'l') || (ctrl_m.cmd === 'r')) { // в повороте
+        if ((ctrl_m.state === 'l') || (ctrl_m.state === 'r')) { // в повороте
             mTurnCancel();
         }
         else {      // стоп
@@ -482,7 +481,7 @@ function motorCommand(ctrl_m) {
     }
     else {
         if ( (ctrl_m.dir > (Math.PI / 4)) && (ctrl_m.dir < (Math.PI * 3 / 4)) ) { // вверх
-            if ((ctrl_m.cmd === 'l') || (ctrl_m.cmd === 'r')) { // в повороте - отменяем поворот
+            if ((ctrl_m.state === 'l') || (ctrl_m.state === 'r')) { // в повороте - отменяем поворот
                 mTurnCancel();
             }
             else {
@@ -511,7 +510,7 @@ function motorCommand(ctrl_m) {
             }
         }
         else if ( (ctrl_m.dir > (Math.PI * 5 / 4)) && (ctrl_m.dir < (Math.PI * 7 / 4)) ) { // вниз
-            if ((ctrl_m.cmd === 'l') || (ctrl_m.cmd === 'r')) { // в повороте - отменяем поворот
+            if ((ctrl_m.state === 'l') || (ctrl_m.state === 'r')) { // в повороте - отменяем поворот
                 mTurnCancel();
             }
             else {
@@ -540,7 +539,7 @@ function motorCommand(ctrl_m) {
             }
         }
         else if ( (ctrl_m.dir > (Math.PI * 3 / 4)) && (ctrl_m.dir < (Math.PI * 5 / 4)) ) { // влево
-            if (ctrl_m.cmd === 'r') {   // если был поворот вправо - просто отменяем
+            if (ctrl_m.state === 'r') {   // если был поворот вправо - просто отменяем
                 mTurnCancel();
             }
             else {
@@ -550,7 +549,7 @@ function motorCommand(ctrl_m) {
             }
         }
         else {  // вправо
-            if (ctrl_m.cmd === 'l') {   // если был поворот влево - отменяем
+            if (ctrl_m.state === 'l') {   // если был поворот влево - отменяем
                 mTurnCancel();
             }
             else {
