@@ -16,14 +16,13 @@
             <span style="margin-top: 10px; margin-left:5%;">УПРАВЛЕНИЕ
             </span>
             <span>
-                <input id ="sw_start" class="toggle-status" type="checkbox" onclick="crtrl_on(this)" style="display:none;">
+                <input id ="sw_start" class="toggle-status" type="checkbox" onclick="crtrl_on(this)"
+                    style="display:none;">
                 <label for="sw_start" class="toggle-switch  toggle-x2 toggle-rounded">
                 </label>
             </span>
-            <span style="margin-left:27%;">
+            <span style="margin-right:5%;">
                 <button id="bt_pwr" onclick="rem_poweroff()">Off</button>
-            </span>
-            <span style="margin-left:32%;"><a id="sett_page"  href="settings.html">НАСТРОЙКИ</a>
             </span>
         </div>
         <div id="stepp_switch">
@@ -80,6 +79,9 @@
                 <div id="servo_info">SERVO</div>
             </div>
         </div>
+        <div id="diagmsg">
+        </div>
+
         <script type="text/javascript" src="js/nipplejs.js"></script>
         <script type="text/javascript" src="js/main.js"></script>
 
@@ -98,7 +100,5 @@
         <span>
             <img id="rmark_ser" src="img/arrow-134-128rb.png"/>
         </span>
-        <div id="diagmsg">?
-        </div>
     </body>
 </html>
