@@ -21,27 +21,33 @@
                 </label>
             </span>
             <span>ON</span>
-            <span style="float: right; margin-right:5%;">
-                <button id="bt_pwr" onclick="rem_poweroff()">Off</button>
-            </span>
-        </div>
-        <div id="stepp_switch">
-            <span style="padding-left: 10%; margin-top: 10px;">УГОЛ</span>
-            <input id ="sw_st1" class="toggle-status" type="checkbox" style="display:none;">
-            <label for="sw_st1" class="toggle-switch  toggle-x4 toggle-rounded">
-            </label>
-            <span style="margin-top: 10px;">ВРАЩЕНИЕ</span>
-            <span style="padding-left: 3%;">
+            <span style="float: center;">
                 <meter id="battery" name="battery"
                 min="0" max="100"
                 low="33" high="66" optimum="80"
                 value="30">
             </span>
-            <span style="padding-left: 5%; margin-top: 10px;">УГОЛ</span>
+            <span style="float: right; margin-right:5%;">
+                <button id="bt_pwr" onclick="rem_poweroff()">OFF</button>
+            </span>
+        </div>
+        <div id="stepp_switch">
+            <span style="padding-left: 10%; margin-top: 10px;">Angle</span>
+            <input id ="sw_st1" class="toggle-status" type="checkbox" style="display:none;">
+            <label for="sw_st1" class="toggle-switch  toggle-x4 toggle-rounded">
+            </label>
+            <span style="margin-top: 10px;">Rotate</span>
+            <!-- <span style="padding-left: 3%;">
+                <meter id="battery" name="battery"
+                min="0" max="100"
+                low="33" high="66" optimum="80"
+                value="30">
+            </span> -->
+            <span style="padding-left: 5%; margin-top: 10px;">Angle</span>
             <input id ="sw_st2" class="toggle-status" type="checkbox" style="display:none;">
             <label for="sw_st2" class="toggle-switch  toggle-x4 toggle-rounded">
             </label>
-            <span style="margin-top: 10px;">ВРАЩЕНИЕ</span>
+            <span style="margin-top: 10px;">Rotate</span>
         </div>
         <div id="stepp_block">
             <div id="stepp1" class="stepps">
