@@ -43,7 +43,7 @@ var ctrlLeds = [0, 0, 0, 0];
 
 var adc_val = [0, 0, 0, 0];
 
-const joystickSize = 150;
+const joystickSize = 160;
 /*
 var storage = window.localStorage;
 
@@ -302,12 +302,12 @@ function sendToESP(token, newcmd, par1, devnum) {
     return true;
 };
 
-var markR = 57;
-var markD = 63;
+var markR = joystickSize / 2 - 3;
+var markD = joystickSize / 2 + 3;
 
-var rmarkR = 57;
-var dmarkR = 63;
-var markMotStep = 48;
+var rmarkR = markR;
+var dmarkR = markD;
+const markMotStep = 48;
 
 var ctrlFlag = false;
 
