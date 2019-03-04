@@ -472,7 +472,7 @@ function motorCommand(ctrl_m) {
     var cmd = 's';
     var param1 = 0;
     var v = 0;
-    if (ctrl_m.dist < 20) { // нажатие в центре - стоп или отмена поворота
+    if (ctrl_m.dist < joystickSize / 2) { // нажатие в центре - стоп или отмена поворота
         if ((ctrl_m.cmd === 'l') || (ctrl_m.cmd === 'r')) { // в повороте
             mTurnCancel();
         }
@@ -565,7 +565,7 @@ function motorCommand(ctrl_m) {
 function steppCommand(ctrl_st) {
     var cmd = 's';
     var param1 = 0;
-    if (ctrl_st.dist < 20) { // нажатие в центре - стоп или возврат в 0
+    if (ctrl_st.dist < joystickSize / 2) { // нажатие в центре - стоп или возврат в 0
 
         switch (ctrl_st.cmd) {
             case 's':               // s уже посылали, посылаем h - home без сброса оборотов
@@ -660,7 +660,7 @@ function servoCommand(ctrl_se) {
     }
 
     var angle = Math.PI / 2; // если нажатие будет в центре - возврат в Pi/2
-    if (ctrl_se.dist > 20) {
+    if (ctrl_se.dist > joystickSize / 2) {
         angle = angleLimit(ctrl_se.dir);
     }
 
