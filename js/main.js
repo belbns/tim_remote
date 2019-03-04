@@ -262,7 +262,7 @@ function writeToScreen(message, type ='') {
     var outputEl = document.getElementById('diagmsg');
     //outputEl.innerHTML = message;
       outputEl.insertAdjacentHTML('afterbegin',
-      '<div' + (type ? ' class="' + type + '"' : '') + 'style="font-size: 10px;">' + message + '</div>');
+      '<div' + (type ? ' class="' + type + '"' : '') + ' style="font-size: 16px;">' + message + '</div>');
 
 }
 
