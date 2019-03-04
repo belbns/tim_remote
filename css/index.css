@@ -20,7 +20,7 @@ html, body {
 #butt_block {
     background: Bisque;
     width: 100%;
-    height: 80px;
+    height: 100px;
     padding-top: 15px;
 }
 
@@ -82,8 +82,8 @@ html, body {
 
 #bt_pwr {
     color: red;
-    height: 60px;
-    width: 60px;
+    height: 80px;
+    width: 80px;
     border: 2px;
     text-align: center;
     text-decoration: none;
