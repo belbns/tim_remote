@@ -77,13 +77,13 @@ function connect() {
 // Запрос выбора Bluetooth устройства
 function requestBluetoothDevice() {
     //
-    writeToScreen('Requesting bluetooth device...');
+    //writeToScreen('Requesting bluetooth device...');
 
     return navigator.bluetooth.requestDevice({
         filters: [{services: [0xFFE0]}],
     }).
         then(device => {
-            writeToScreen('"' + device.name + '" bluetooth device selected');
+            //writeToScreen('"' + device.name + '" bluetooth device selected');
             deviceCache = device;
 
             // Добавленная строка
@@ -98,8 +98,8 @@ function requestBluetoothDevice() {
 function handleDisconnection(event) {
     let device = event.target;
 
-    writeToScreen('"' + device.name +
-        '" bluetooth device disconnected, trying to reconnect...');
+    //writeToScreen('"' + device.name +
+    //    '" bluetooth device disconnected, trying to reconnect...');
 
     connectDeviceAndCacheCharacteristic(device).
         then(characteristic => startNotifications(characteristic)).
@@ -109,17 +109,17 @@ function handleDisconnection(event) {
 // Отключиться от подключенного устройства
 function disconnect() {
     if (deviceCache) {
-        writeToScreen('Disconnecting from "' + deviceCache.name + '" bluetooth device...');
+        //writeToScreen('Disconnecting from "' + deviceCache.name + '" bluetooth device...');
         deviceCache.removeEventListener('gattserverdisconnected',
             handleDisconnection);
 
         if (deviceCache.gatt.connected) {
             deviceCache.gatt.disconnect();
-            writeToScreen('"' + deviceCache.name + '" bluetooth device disconnected');
+            //writeToScreen('"' + deviceCache.name + '" bluetooth device disconnected');
         }
         else {
-            writeToScreen('"' + deviceCache.name +
-                '" bluetooth device is already disconnected');
+            //writeToScreen('"' + deviceCache.name +
+            //    '" bluetooth device is already disconnected');
         }
     }
 
@@ -140,21 +140,21 @@ function connectDeviceAndCacheCharacteristic(device) {
         return Promise.resolve(characteristicCache);
     }
 
-    writeToScreen('Connecting to GATT server...');
+    //writeToScreen('Connecting to GATT server...');
 
     return device.gatt.connect().
         then(server => {
-            writeToScreen('GATT server connected, getting service...');
+            //writeToScreen('GATT server connected, getting service...');
 
             return server.getPrimaryService(0xFFE0);
         }).
         then(service => {
-            writeToScreen('Service found, getting characteristic...');
+            //writeToScreen('Service found, getting characteristic...');
 
             return service.getCharacteristic(0xFFE1);
         }).
         then(characteristic => {
-            writeToScreen('Characteristic found');
+            //writeToScreen('Characteristic found');
             characteristicCache = characteristic;
 
             return characteristicCache;
@@ -164,11 +164,11 @@ function connectDeviceAndCacheCharacteristic(device) {
 // Включение получения уведомлений об изменении характеристики
 function startNotifications(characteristic) {
     //
-    writeToScreen('Starting notifications...');
+    //writeToScreen('Starting notifications...');
 
     return characteristic.startNotifications().
         then(() => {
-            writeToScreen('Notifications started');
+            //writeToScreen('Notifications started');
             // Добавленная строка
             characteristic.addEventListener('characteristicvaluechanged',
                 handleCharacteristicValueChanged);
@@ -260,9 +260,8 @@ function writeToCharacteristic(characteristic, data) {
 
 function writeToScreen(message, type ='') {
     var outputEl = document.getElementById('diagmsg');
-    //outputEl.innerHTML = message;
       outputEl.insertAdjacentHTML('afterbegin',
-      '<div' + (type ? ' class="' + type + '"' : '') + ' style="font-size: 16px;">' + message + '</div>');
+      '<div' + (type ? ' class="' + type + '"' : '') + '>' + message + '</div>');
 
 }
 
