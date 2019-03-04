@@ -40,8 +40,8 @@ def parse_inbuf(buf):
 			else:
 				nstate = "s"
 		else:	# nstate == "s":
-			motors['vall'] = motors['vleft'] = motors['vriight'] = 0
-			
+			motors['vall'] = motors['vleft'] = motors['vright'] = 0
+
 		motors['state'] = nstate
 		st = '{"ms":["' + nstate + '",' + str(motors['vall']) + ',' + str(motors['vleft']) + \
 			',' + str(motors['vright']) + ']}\n'

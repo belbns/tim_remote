@@ -261,8 +261,8 @@ function writeToCharacteristic(characteristic, data) {
 function writeToScreen(message, type ='') {
     var outputEl = document.getElementById('diagmsg');
     //outputEl.innerHTML = message;
-      outputEl.insertAdjacentHTML('beforeend',
-      '<div' + (type ? ' class="' + type + '"' : '') + '>' + message + '</div>');
+      outputEl.insertAdjacentHTML('afterbegin',
+      '<div' + (type ? ' class="' + type + '"' : '') + 'style="font-size: 10px;">' + message + '</div>');
 
 }
 
