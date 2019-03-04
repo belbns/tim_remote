@@ -43,7 +43,7 @@ var ctrlLeds = [0, 0, 0, 0];
 
 var adc_val = [0, 0, 0, 0];
 
-
+const joystickSize = 150;
 /*
 var storage = window.localStorage;
 
@@ -675,7 +675,7 @@ var joystickStepp1 = nipplejs.create({
     mode: 'static',
     position: getJoystickPos('stepp1'),
     color: 'green',
-    size: 120
+    size: joystickSize
 });
 joystickStepp1.on('move', function (evt, nipple) {
     ctrlStepp[0].dir = nipple.angle.radian;
@@ -695,7 +695,7 @@ var joystickStepp2 = nipplejs.create({
     mode: 'static',
     position: getJoystickPos('stepp2'),
     color: 'blue',
-    size: 120
+    size: joystickSize
 });
 joystickStepp2.on('move', function (evt, nipple) {
     ctrlStepp[1].dir = nipple.angle.radian;
@@ -716,7 +716,7 @@ var joystickMotors = nipplejs.create({
     position: getJoystickPos('motors'),
     color: 'brown',
     //lockX: true,
-    size: 120
+    size: joystickSize
 });
 joystickMotors.on('move', function (evt, nipple) {
     ctrlMotors.dir = nipple.angle.radian;
@@ -738,7 +738,7 @@ var joystickServo = nipplejs.create({
     position: getJoystickPos('servo'),
     color: 'red',
     //lockX: true,
-    size: 128
+    size: joystickSize
 });
 joystickServo.on('move', function (evt, nipple) {
     ctrlServo.dir = nipple.angle.radian;
