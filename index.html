@@ -10,38 +10,38 @@
     </head>
     <body onresize="resize_on(this)">
         <div id="head2" style="text-align: center;">
-            <h2>Пульт управления мобильной платформой</h2>
+            <h2>Remote Control for Tim mobile device</h2>
         </div>
-        <div id="butt_block">
-            <span style="display: flex; justify-content: left;">
-                <span>OFF</span>
+        <div id="butt_block" style="display: flex; justify-content: space-between;">
+            <span>
+                <span style="padding-left: 5px;">BLE</span>
                 <span>
                     <input id ="sw_start" class="toggle-status" type="checkbox" onclick="crtrl_on(this)"
                         style="display:none;">
                     <label for="sw_start" class="toggle-switch  toggle-x6 toggle-rounded">
                     </label>
                 </span>
-                <span>ON</span>
+                <!--<span>ON</span> -->
             </span>
-            <span style="display: flex; justify-content: center;">
+            <span style="padding-top: 30px;">
                 <meter id="battery" name="battery"
                 min="0" max="100"
                 low="33" high="66" optimum="80"
                 value="30">
             </span>
-            <span style="justify-content: right;">
+            <span style="padding-right: 40px;">
                 <button id="bt_pwr" onclick="rem_poweroff()">OFF</button>
             </span>
         </div>
-        <div id="stepp_switch">
-            <span style="float: left; padding-left: 40px;">
+        <div id="stepp_switch" style="display: flex; justify-content: space-around;">
+            <span>
                 <span>ANGLE</span>
                 <input id ="sw_st1" class="toggle-status" type="checkbox" style="display:none;">
                 <label for="sw_st1" class="toggle-switch  toggle-x4 toggle-rounded">
                 </label>
                 <span>ROTATE</span>
             </span>
-            <span style="float: right; padding-right: 40px;">
+            <span>
                 <span>ANGLE</span>
                 <input id ="sw_st2" class="toggle-status" type="checkbox" style="display:none;">
                 <label for="sw_st2" class="toggle-switch  toggle-x4 toggle-rounded">
@@ -49,38 +49,37 @@
                 <span>ROTATE</span>
             </span>
         </div>
-        <div id="stepp_block">
+        <div id="stepp_block" style="display: flex; justify-content: space-between;">
             <div id="stepp1" class="stepps">
-                <div id="stepp1_info">ШД1</div>
+                <div id="stepp1_info">STEPP1</div>
             </div>
-            <div id="btcont">
+            <div id="btcont" style="display: flex; flex-direction: column; justify-content: space-around;">
                 <button id="bt-led0" class="bt-led" onclick="led_switch(this.id)">0</button>
                 <button id="bt-led1" class="bt-led" onclick="led_switch(this.id)">1</button>
                 <button id="bt-led2" class="bt-led" onclick="led_switch(this.id)">2</button>
                 <button id="bt-led3" class="bt-led" onclick="led_switch(this.id)">3</button>
             </div>
             <div id="stepp2" class="stepps">
-                <div id="stepp2_info">ШД2</div>
+                <div id="stepp2_info">STEPP2</div>
             </div>
         </div>
         <div id="dist_block">
-            <span style="margin-top: 10px; margin-left:5%;">Измерение расстояния</span>
+            <span style="margin-top: 10px; margin-left:5%;">CHECK DIST.</span>
             <span style="margin-top: 5px;">
                 <input id ="dist_sw" class="toggle-status" type="checkbox" style="display:none;">
                 <label for="dist_sw" class="toggle-switch  toggle-x4 toggle-rounded"></label>                
             </span>
         </div>
-        <div id="helm_block">
+        <div id="helm_block" style="display: flex; justify-content: space-between;">
             <div id="motors" class="helms">
                 <div id="motors_info">MOTORS</div>
             </div>
             <div id="gyro_cont">
-                <p>Гироскоп
-                <br>Выкл/Вкл</p>
+                <p>GYRO
+                <br>OFF/ON</p>
                 <input id ="gyro_sw" class="toggle-status" type="checkbox" style="display:none;">
                 <label for="gyro_sw" class="toggle-switch  toggle-x4 toggle-rounded"></label>
             </div>
-
             <div id="servo" class="helms">
                 <div id="servo_info">SERVO</div>
             </div>
