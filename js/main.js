@@ -258,9 +258,21 @@ function writeToCharacteristic(characteristic, data) {
     characteristic.writeValue(new TextEncoder().encode(data));
 }
 
+const scrLen = 10;
 function writeToScreen(message, type ='') {
     var outputEl = document.getElementById('diagmsg');
-      outputEl.insertAdjacentHTML('afterbegin',
+    //var blocks = outputEl.children;
+/*
+    for (i=blocks.length - 1; i >= 0; i--) {
+        if (i <= scrLen) break;
+        main_block.removeChild(blocks[i]);
+    }
+*/
+    if (outputEl.children.length == scrLen) {
+        outputEl.removeChild(outputEl.children[0]);
+    }
+
+    outputEl.insertAdjacentHTML('beforeend',
       '<div' + (type ? ' class="' + type + '"' : '') + '>' + message + '</div>');
 
 }
