@@ -5,8 +5,19 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
-        <link rel="stylesheet" type="text/css" href="css/index.css">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="description"
+          content="Progressive Web Application for serial communication with toy mobile device">
+
         <title>Tim remote</title>
+
+        <link rel="manifest" href="manifest.json">
+        <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
+        <link rel="mask-icon" href="icons/safari-pinned-tab.svg" color="#2196f3">
+        <link rel="shortcut icon" href="icons/favicon.ico">
+        <link rel="stylesheet" type="text/css" href="css/index.css">
     </head>
     <body onresize="resize_on(this)">
         <div id="head2" style="text-align: center;">
@@ -86,10 +97,6 @@
         </div>
         <div id="diagmsg">
         </div>
-
-        <script type="text/javascript" src="js/nipplejs.js"></script>
-        <script type="text/javascript" src="js/main.js"></script>
-
         <span id="mark_st1" class="mark dmark"></span>
         <span id="mark_st2" class="mark dmark"></span>
         <span id="mark_mot" class="mark dmark"></span>
@@ -105,5 +112,8 @@
         <span>
             <img id="rmark_ser" src="img/arrow-134-128rb.png"/>
         </span>
+        <script type="text/javascript" src="js/nipplejs.js"></script>
+        <script type="text/javascript" src="js/main.js"></script>
+        <script type="text/javascript" src="js/companion.js" data-service-worker="sw.js"></script>
     </body>
 </html>
