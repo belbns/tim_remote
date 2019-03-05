@@ -1,4 +1,4 @@
-importScripts('sw-toolbox.js');
+importScripts('js/sw-toolbox.js');
 
 toolbox.precache([
     'companion.js',
