@@ -281,7 +281,7 @@ function writeToScreen(message) {
     }
     
     outputEl.insertAdjacentHTML('beforeend',
-      '<div><font size="32px" color="red" face="Arial">' + message + '</font></div>');
+      '<div><p><font size="32px" color="red" face="Arial">' + message + '</font></div>');
 }
 
 function cleanScreen() {
