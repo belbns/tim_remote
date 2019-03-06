@@ -77,6 +77,13 @@ function connect() {
         document.getElementById('rmark_motl').style.visibility = 'visible';
         document.getElementById('rmark_motr').style.visibility = 'visible';
         document.getElementById('rmark_ser').style.visibility = 'visible';
+
+        writeToScreen('== BLE connected ==');
+        writeToScreen('== BLE connected ==');
+        writeToScreen('== BLE connected ==');
+        writeToScreen('== BLE connected ==');
+        writeToScreen('== BLE connected ==');
+        writeToScreen('== BLE connected ==');
         cleanScreen();
         writeToScreen('== BLE connected ==');
     }
