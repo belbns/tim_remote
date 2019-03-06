@@ -210,8 +210,13 @@ html, body {
 }
 
 .myterm {
-    font-size: 24px;
+    font: 16pt sans-serif;
 }
+
+#diagmsg {
+    font: 16pt sans-serif;
+}
+
 // ---------- switch -----------
 
 /* -------------------------------------------------------------
