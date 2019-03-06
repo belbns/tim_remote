@@ -210,11 +210,15 @@ html, body {
 }
 
 .myterm {
-    font: 16pt sans-serif;
+    font-family:    Arial, Helvetica, sans-serif;
+    font-size:      20px;
+    font-weight:    bold;
 }
 
 #diagmsg {
-    font: 16pt sans-serif;
+    font-family:    Arial, Helvetica, sans-serif;
+    font-size:      20px;
+    font-weight:    bold;
 }
 
 // ---------- switch -----------
