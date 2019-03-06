@@ -77,6 +77,8 @@ function connect() {
         document.getElementById('rmark_motl').style.visibility = 'visible';
         document.getElementById('rmark_motr').style.visibility = 'visible';
         document.getElementById('rmark_ser').style.visibility = 'visible';
+        cleanScreen();
+        writeToScreen('== BLE connected ==');
     }
     return ret;
 }
@@ -281,6 +283,13 @@ function writeToScreen(message) {
       '<div class="myterm">' + message + '</div>');
 }
 
+function cleanScreen() {
+    var outputEl = document.getElementById('diagmsg');
+    var l = outputEl.children.length;
+    for (var i = l - 1; i >= 0; i--) {
+        outputEl.removeChild(outputEl.children[i]);
+    }    
+}
 
 function sendToESP(token, newcmd, par1, devnum) {
     var st = '{"' + token + '":';
