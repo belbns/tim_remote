@@ -78,12 +78,6 @@ function connect() {
         document.getElementById('rmark_motr').style.visibility = 'visible';
         document.getElementById('rmark_ser').style.visibility = 'visible';
 
-        writeToScreen('== BLE connected ==');
-        writeToScreen('== BLE connected ==');
-        writeToScreen('== BLE connected ==');
-        writeToScreen('== BLE connected ==');
-        writeToScreen('== BLE connected ==');
-        writeToScreen('== BLE connected ==');
         cleanScreen();
         writeToScreen('== BLE connected ==');
     }
@@ -287,7 +281,7 @@ function writeToScreen(message) {
     }
     
     outputEl.insertAdjacentHTML('beforeend',
-      '<div class="myterm">' + message + '</div>');
+      '<div><font size="32px" color="red" face="Arial">' + message + '</font></div>');
 }
 
 function cleanScreen() {
