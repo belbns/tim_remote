@@ -190,7 +190,7 @@ function startNotifications(characteristic) {
 // Получение данных
 function handleCharacteristicValueChanged(event) {
     let value = new TextDecoder().decode(event.target.value);
-    writeToScreen(value, 'in');
+    writeToScreen('rec: ' + value);
 
     var event = JSON.parse(value);
     if (event.hasOwnProperty('ms')) {
@@ -262,7 +262,7 @@ function doSend(message) {
         return;
     }
     writeToCharacteristic(characteristicCache, message);
-    writeToScreen(message, 'out');
+    writeToScreen('send: ' + message);
 }
 
 // Записать значение в характеристику
@@ -271,15 +271,14 @@ function writeToCharacteristic(characteristic, data) {
 }
 
 const scrLen = 10;
-function writeToScreen(message, type ='') {
+function writeToScreen(message) {
     var outputEl = document.getElementById('diagmsg');
     if (outputEl.children.length == scrLen) {
         outputEl.removeChild(outputEl.children[0]);
     }
     
     outputEl.insertAdjacentHTML('beforeend',
-      '<div' + (type ? ' class="' + type + '"' : '') + '>' + message + '</div>');
-
+      '<div class="myterm">' + message + '</div>');
 }
 
 
