@@ -273,7 +273,7 @@ function writeToCharacteristic(characteristic, data) {
     characteristic.writeValue(new TextEncoder().encode(data));
 }
 
-const scrLen = 5;
+const scrLen = 6;
 function writeToScreen(message) {
     var outputEl = document.getElementById('diagmsg');
     if (outputEl.children.length == scrLen) {
