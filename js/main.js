@@ -486,7 +486,7 @@ function motorCommand(ctrl_m) {
 
     var cmd = 's';
     var v = 0;
-    if (ctrl_m.dist < (joystickSize / 2 - 10)) { // нажатие в центре - стоп или отмена поворота
+    if (ctrl_m.dist < (joystickSize / 2 + 10)) { // нажатие в центре - стоп или отмена поворота
         if ((ctrl_m.state === 'l') || (ctrl_m.state === 'r')) { // в повороте
             mTurnCancel();
         }
