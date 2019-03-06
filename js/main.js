@@ -67,11 +67,18 @@ let characteristicCache = null;
 
 // Запустить выбор Bluetooth устройства и подключиться к выбранному
 function connect() {
-    return (deviceCache ? Promise.resolve(deviceCache) :
+    var ret = (deviceCache ? Promise.resolve(deviceCache) :
         requestBluetoothDevice()).
         then(device => connectDeviceAndCacheCharacteristic(device)).
         then(characteristic => startNotifications(characteristic)).
         catch(error => writeToScreen(error));
+
+    if (ret) {
+        document.getElementById('rmark_motl').style.visibility = 'visible';
+        document.getElementById('rmark_motr').style.visibility = 'visible';
+        document.getElementById('rmark_ser').style.visibility = 'visible';
+    }
+    return ret;
 }
 
 // Запрос выбора Bluetooth устройства
@@ -131,6 +138,11 @@ function disconnect() {
     }
 
     deviceCache = null;
+
+    document.getElementById('rmark_motl').style.visibility = 'hidden';
+    document.getElementById('rmark_motr').style.visibility = 'hidden';
+    document.getElementById('rmark_ser').style.visibility = 'hidden';
+
 }
 
 // Подключение к определенному устройству, получение сервиса и характеристики
@@ -261,17 +273,10 @@ function writeToCharacteristic(characteristic, data) {
 const scrLen = 10;
 function writeToScreen(message, type ='') {
     var outputEl = document.getElementById('diagmsg');
-    //var blocks = outputEl.children;
-/*
-    for (i=blocks.length - 1; i >= 0; i--) {
-        if (i <= scrLen) break;
-        main_block.removeChild(blocks[i]);
-    }
-*/
     if (outputEl.children.length == scrLen) {
         outputEl.removeChild(outputEl.children[0]);
     }
-
+    
     outputEl.insertAdjacentHTML('beforeend',
       '<div' + (type ? ' class="' + type + '"' : '') + '>' + message + '</div>');
 
