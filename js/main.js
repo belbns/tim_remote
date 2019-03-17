@@ -1,7 +1,7 @@
 // переменные управления мобильной платформой
 var ctrlMotors = {  // ДПТ
     state: 's',         // теущий статус <- МП ("s"|"r"|"l"|"f"|"b")
-    queue: false,       // наличие команд моторов в очереди <- МП
+    queue: 0,           // наличие команд моторов в очереди <- МП
     cmd: 's',           // последняя команда -> МП ("s"|"r"|"l"|"f"|"b")
     v_dst: 0,           // заданная скорость -> МП (-3..0..3)
     v_real: 3,          // реальная скорость <- МП
@@ -20,6 +20,7 @@ var ctrlMotors = {  // ДПТ
 var ctrlServo = {       // Серво привод
     angle_dst: Math.PI/2,  
     angle_real: Math.PI/2,
+    queue: 0,           // наличие команд в очереди <- МП
     dir: 0,
     dist: 0 ,
     id: 'servo',
@@ -30,19 +31,26 @@ var ctrlServo = {       // Серво привод
 }
 
 var ctrlStepp = [
-    { num: 0,  mode: 'm', state: 's', queue: false, cmd: 's', angle_dst: Math.PI/2, 
+    { num: 0,  mode: 'm', state: 's', queue: 0, cmd: 's', angle_dst: Math.PI/2, 
         angle_real: Math.PI/2, turn: 'n', dir: Math.PI/2, dist: 0, id: 'stepp1', token: 'st', 
         info: 'stepp1_info', modesw : 'sw_st1', markd: 'mark_st1', markr: 'rmark_st1' 
     },
-    { num: 1,  mode: 'm', state: 's', queue: false, cmd: 's', angle_dst: Math.PI/2, 
+    { num: 1,  mode: 'm', state: 's', queue: 0, cmd: 's', angle_dst: Math.PI/2, 
         angle_real: Math.PI/2, turn: 'n', dir: Math.PI/2, dist: 0, id: 'stepp2', token: 'st',
         info: 'stepp2_info', modesw : 'sw_st2', markd: 'mark_st2', markr: 'rmark_st2' 
     } ];
 
 var ctrlLeds = [0, 0, 0, 0];
-
+var LedsQueue = 0;
+var Dist = 2048;
+var DistQueue = 0;
+var CmdQueue = 0;
 var adc_val = [0, 0, 0, 0];
+var LowBatt = false;
+var HighLoad = false;
 
+const adcBattMin = 1580;
+const battMeterMax = 120;
 /*
 var storage = window.localStorage;
 
@@ -215,13 +223,15 @@ function handleCharacteristicValueChanged(event) {
         ctrlMotors.v_right = vv;
         jPosMotDraw(ctrlMotors)
     }
-    else if (event.hasOwnProperty('mq')) {
-        ctrlMotors.queue = event.mq;
-
+    else if (event.hasOwnProperty('qmot')) {
+        ctrlMotors.queue = event.qmot;
     }
     else if(event.hasOwnProperty('servo')) {
         ctrlServo.angle_real = (event.servo - 18) * Math.PI / 18;
         jPosDrawServo(ctrlServo);
+    }
+    else if (event.hasOwnProperty('qservo')) {
+        ctrlServo.queue = event.qservo;
     }
     else if (event.hasOwnProperty('ss')) {
         ctrlStepp[event.ss[0]].state = event.ss[1];
@@ -233,11 +243,60 @@ function handleCharacteristicValueChanged(event) {
         ctrlStepp[event.sv[0]].angle_real = event.sv[2] * Math.PI / 256 + Math.PI / 2;
         jPosDraw(ctrlStepp[event.sv[0]]);
     }
-    else if (event.hasOwnProperty('sq')) {
-        ctrlStepp[event.sq[0]].queue = event.sq[1];
+    else if (event.hasOwnProperty('qst1')) {
+        ctrlStepp[0].queue = event.qst1;
+    }
+    else if (event.hasOwnProperty('qst2')) {
+        ctrlStepp[1].queue = event.qst2;
     }
     else if (event.hasOwnProperty('adc')) {
         adc_val[event.adc[0]] = event.adc[1];
+        var meterb = document.getElementById('battery');
+        if (event.adc[0] == 0) {    // 3.3v
+            var vt = Math.round((adc_val[0] - adcBattMin) / 3);
+            if (vt > 0) {
+                if (vt > battMeterMax) {
+                    vt = battMeterMax;
+                }
+                else {
+                    vt = 0;
+                }
+            }
+            meterb.setAttribute('value', vt.toString());
+        }
+    }
+    else if (event.hasOwnProperty('led')) {
+        var ll = event.led[1];
+        if (ll == 'b') {
+            ctrlLeds[event.led[0]] = 2;
+        }
+        else if (ll == 'u') {
+            ctrlLeds[event.led[0]] = 1;
+        }
+        else {
+            ctrlLeds[event.led[0]] = 0;
+        }
+    }
+    else if (event.hasOwnProperty('qleds')) {
+        LedsQueue = event.qleds;
+    }
+    else if (event.hasOwnProperty('dist')) {
+        Dist = event.qleds;
+    }
+    else if (event.hasOwnProperty('qdist')) {
+        DistQueue = event.qdist;
+    }
+    else if (event.hasOwnProperty('queue')) {
+        CmdQueue = event.queue;
+    }
+    else if (event.hasOwnProperty('batt')) {
+        var bb = event.batt;
+        if (bb == 'l') {
+            HighLoad = true;
+        }
+        else if (bb == 'b') {
+            LowBatt = true;
+        }
     }
 
 }
@@ -292,7 +351,7 @@ function cleanScreen() {
     }    
 }
 
-function sendToESP(token, newcmd, par1, devnum) {
+function sendToBLE(token, newcmd, par1, devnum) {
     var st = '{"' + token + '":';
     switch(token) {
         case 'mot':
@@ -300,19 +359,37 @@ function sendToESP(token, newcmd, par1, devnum) {
             if (par1 < 0) {
                 p1 = 4 - par1;
             }
-            st = st + '["' + newcmd + '",' + p1.toString() + ']';
+            if ((newcmd === 'l') || (newcmd === 'r') || (newcmd === 'n') || (newcmd === 's')) {
+                st = st + '"' + newcmd + '"';    
+            }
+            else {}
+                st = st + '["' + newcmd + '",' + p1.toString() + ']';
+            }
             break;
-        case 'led':
-            st = st + '[' + devnum.toString() + ',"' + newcmd + '"]';
+        case 'le':
+            if (newcmd === 'p') {
+                st = st + '["' + newcmd + '",'+ par1.toString() + ']';
+            }
+            else {
+                st = st + '["' + newcmd + '",'+ devnum.toString() + ']';
+            }
+
             break;
         case 'st':
-            st = st + '[' + devnum.toString() + ',"' + newcmd + '",' + par1.toString() + ']';
+            if ((newcmd === 'p') || (newcmd === 'a')) {
+                st = st + '["' + newcmd + '",' + devnum.toString() + ',' + par1.toString() + ']';
+            }
+            else {
+                st = st + '["' + newcmd + '",' + devnum.toString() + ']';
+            }
             break;
         case 'echo':
+        case 'servo':
+            st = st + '["' + newcmd + '",' + devnum.toString() + ']';
+            break;
         case 'dist':
             st = st + '"' + newcmd + '"';
             break;
-        case 'servo':
         case 'pause':
         case 'check':
         case 'pwroff':
@@ -472,7 +549,7 @@ function motorCommand(ctrl_m) {
 
     function mTurnCancel() {
         var cmd = 'n';
-        if ( sendToESP(ctrl_m.token, 'n', ctrl_m.v_dst, 0) ) {
+        if ( sendToBLE(ctrl_m.token, 'n', ctrl_m.v_dst, 0) ) {
             if (ctrl_m.v_dst > 0) {
                 ctrl_m.cmd = 'f';
             }
@@ -487,7 +564,7 @@ function motorCommand(ctrl_m) {
     }
 
     function mStop() {
-        if ( sendToESP(ctrl_m.token, 's', 0, 0) ) {
+        if ( sendToBLE(ctrl_m.token, 's', 0, 0) ) {
             ctrl_m.cmd = 's';
             ctrl_m.v_dst = 0;
             //document.getElementById(ctrl_m.id).style['background-image'] = 'none';
@@ -526,7 +603,7 @@ function motorCommand(ctrl_m) {
                         mStop();
                     }
                     else {
-                        if (sendToESP(ctrl_m.token, cmd, v, 0)) {
+                        if (sendToBLE(ctrl_m.token, cmd, v, 0)) {
                             ctrl_m.cmd = cmd;
                             ctrl_m.v_dst = v;
                         }
@@ -555,7 +632,7 @@ function motorCommand(ctrl_m) {
                         mStop();
                     }
                     else {
-                        if (sendToESP(ctrl_m.token, cmd, v, 0)) {
+                        if (sendToBLE(ctrl_m.token, cmd, v, 0)) {
                             ctrl_m.cmd = cmd;
                             ctrl_m.v_dst = v;
                         }
@@ -568,7 +645,7 @@ function motorCommand(ctrl_m) {
                 mTurnCancel();
             }
             else {
-                if (sendToESP(ctrl_m.token, 'l', 0, 0)) {
+                if (sendToBLE(ctrl_m.token, 'l', 0, 0)) {
                     ctrl_m.cmd = 'l';
                 }                
             }
@@ -578,7 +655,7 @@ function motorCommand(ctrl_m) {
                 mTurnCancel();
             }
             else {
-                if (sendToESP(ctrl_m.token, 'r', 0, 0)) {
+                if (sendToBLE(ctrl_m.token, 'r', 0, 0)) {
                     ctrl_m.cmd = 'r';
                 }                
             }
@@ -603,7 +680,7 @@ function steppCommand(ctrl_st) {
                 cmd = 's';
         }
 
-        if (sendToESP(ctrl_st.token, cmd, param1, ctrl_st.num)) {
+        if (sendToBLE(ctrl_st.token, cmd, param1, ctrl_st.num)) {
             ctrl_st.cmd = cmd;
             ctrl_st.angle_dst = Math.PI / 2;
         }
@@ -621,7 +698,7 @@ function steppCommand(ctrl_st) {
                     else {
                         cmd = 'l';
                     }
-                    if (sendToESP(ctrl_st.token, cmd, 0, ctrl_st.num))
+                    if (sendToBLE(ctrl_st.token, cmd, 0, ctrl_st.num))
                     {
                         ctrl_st.cmd = cmd;
                     }
@@ -636,7 +713,7 @@ function steppCommand(ctrl_st) {
                     else {
                         cmd = 'r';
                     }
-                    if (sendToESP(ctrl_st.token, cmd, 0, ctrl_st.num))
+                    if (sendToBLE(ctrl_st.token, cmd, 0, ctrl_st.num))
                     {
                         ctrl_st.cmd = cmd;
                     }
@@ -651,7 +728,7 @@ function steppCommand(ctrl_st) {
             }
             param1 = Math.round(an * 512 / (2 * Math.PI));  // пересчитываем в шаги ШД
             cmd = 'a';
-            if (sendToESP(ctrl_st.token, cmd, param1, ctrl_st.num))
+            if (sendToBLE(ctrl_st.token, cmd, param1, ctrl_st.num))
             {
                 ctrl_st.cmd = cmd;
                 ctrl_st.angle_dst = r_angle;
@@ -688,7 +765,7 @@ function servoCommand(ctrl_se) {
         angle = angleLimit(ctrl_se.dir);
     }
 
-    if (sendToESP(ctrl_se.token, 's', servoAngle(angle), 0)) {
+    if (sendToBLE(ctrl_se.token, 's', servoAngle(angle), 0)) {
         ctrl_se.angle_dst = angle;
     }
 };
@@ -814,7 +891,7 @@ function led_switch(clicked_id) {
     }
 
 
-    if ( sendToESP('led', cmd, 0, led) ) {
+    if ( sendToBLE('le', cmd, 0, led) ) {
         butt.style['background-image'] = st;
         ctrlLeds[led] = l;
     }
