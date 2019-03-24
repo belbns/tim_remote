@@ -362,7 +362,7 @@ function sendToBLE(token, newcmd, par1, devnum) {
             if ((newcmd === 'l') || (newcmd === 'r') || (newcmd === 'n') || (newcmd === 's')) {
                 st = st + '"' + newcmd + '"';    
             }
-            else {}
+            else {
                 st = st + '["' + newcmd + '",' + p1.toString() + ']';
             }
             break;
