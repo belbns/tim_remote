@@ -17,7 +17,13 @@ motors = {'queue':0, 'state':'s', 'vall':0, 'vleft': 0, 'vright':0}
 stepp = [   {'token':'st', 'queue':0, 'state':'s', 'mode':'m', 'turns':0, 'angle':0},
             {'token':'st', 'queue':0, 'state':'s', 'mode':'m', 'turns':0, 'angle':0} ]
 leds = ['d', 'd', 'd', 'd']
+qleds = 0;
+
 servo = 27
+qservo = 0
+
+dist = 0
+qdist = 0
 
 def parse_inbuf(buf):
 	print buf
