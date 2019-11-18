@@ -461,7 +461,7 @@ function jPosDrawServo(ctrl_j) {
 //    mr.style.transform = "rotate(" + String(Math.PI / 2 - ctrl_j.angle_real) + "rad)";
     mr.style.transform = "rotate(" + String(90 - ctrl_j.angle_real) + "deg)";
 
-    a = ctrl_j.angle_dst;
+    a_rad = ctrl_j.angle_dst * Math.PI / 180;
     var md = document.getElementById(ctrl_j.markd);
     x = xy['x'] + dmarkR * Math.cos(a_rad);
     y = xy['y'] - dmarkR * Math.sin(a_rad);
