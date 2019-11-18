@@ -453,6 +453,7 @@ function jPosDraw(ctrl_j) {
 function jPosDrawServo(ctrl_j) {
     var xy = calcContCenter(ctrl_j.id);
     var a = ctrl_j.angle_real;
+    var a_rad = a * Math.PI / 180;
     var mr = document.getElementById(ctrl_j.markr);
 
     mr.style.left = xy['x'] - 64 + 'px';
@@ -462,8 +463,8 @@ function jPosDrawServo(ctrl_j) {
 
     a = ctrl_j.angle_dst;
     var md = document.getElementById(ctrl_j.markd);
-    x = xy['x'] + dmarkR * Math.cos(a);
-    y = xy['y'] - dmarkR * Math.sin(a);
+    x = xy['x'] + dmarkR * Math.cos(a_rad);
+    y = xy['y'] - dmarkR * Math.sin(a_rad);
     md.style.left = x - 5 + 'px';
     md.style.top = y - 5 + 'px';
 }
