@@ -17,9 +17,12 @@ var ctrlMotors = {  // ДПТ
     markr: 'rmark_motr'
 };
 
-var ctrlServo = {       // Серво привод
-    angle_dst: Math.PI/2,  
-    angle_real: Math.PI/2,
+// Серво привод, на моб. пл. передается в градусах 0..180, 90 - центр
+var ctrlServo = {
+//    angle_dst: Math.PI/2,  
+//    angle_real: Math.PI/2,
+    angle_dst: 90,  
+    angle_real: 90,
     queue: 0,           // наличие команд в очереди <- МП
     dir: 0,
     dist: 0 ,
@@ -227,7 +230,8 @@ function handleCharacteristicValueChanged(event) {
         ctrlMotors.queue = event.qmot;
     }
     else if(event.hasOwnProperty('servo')) {
-        ctrlServo.angle_real = (event.servo - 18) * Math.PI / 18;
+    //    ctrlServo.angle_real = (event.servo - 180) * Math.PI / 180;
+        ctrlServo.angle_real = event.servo;
         jPosDrawServo(ctrlServo);
     }
     else if (event.hasOwnProperty('qservo')) {
@@ -448,7 +452,8 @@ function jPosDrawServo(ctrl_j) {
 
     mr.style.left = xy['x'] - 64 + 'px';
     mr.style.top = xy['y'] - 64 + 'px';
-    mr.style.transform = "rotate(" + String(Math.PI / 2 - ctrl_j.angle_real) + "rad)";
+//    mr.style.transform = "rotate(" + String(Math.PI / 2 - ctrl_j.angle_real) + "rad)";
+    mr.style.transform = "rotate(" + String(90 - ctrl_j.angle_real) + "deg)";
 
     a = ctrl_j.angle_dst;
     var md = document.getElementById(ctrl_j.markd);
@@ -739,7 +744,7 @@ function steppCommand(ctrl_st) {
 
 
 function servoCommand(ctrl_se) {
-
+/*
     function angleLimit(a) {
         var an = a;
         if (an > Math.PI) {
@@ -755,17 +760,39 @@ function servoCommand(ctrl_se) {
         }
         return an;
     }
-
-    function servoAngle(al) {
-        return 18 + Math.round(al * 18 / Math.PI);
+*/
+    function angleLimit(a) {
+        var an = a;
+        if (an > 180) {
+            if (an < 225) {
+                an = 180;
+            }
+            else if (an > 315) {
+                an = 0;
+            }
+            else {
+                an = 90;   // нижний сектор - стоп
+            }
+        }
+        return an;
     }
 
-    var angle = Math.PI / 2; // если нажатие будет в центре - возврат в Pi/2
+/*
+    function servoAngle(al) {
+        return 180 + Math.round(al * 180 / Math.PI);
+    }
+*/
+//    var angle = Math.PI / 2; // если нажатие будет в центре - возврат в Pi/2
+    var angle = 90; // если нажатие будет в центре - возврат в 90 град.
     if (ctrl_se.dist > (joystickSize / 2 - 10)) {
         angle = angleLimit(ctrl_se.dir);
     }
-
+/*
     if (sendToBLE(ctrl_se.token, 's', servoAngle(angle), 0)) {
+        ctrl_se.angle_dst = angle;
+    }
+    */
+    if (sendToBLE(ctrl_se.token, 's', angle, 0)) {
         ctrl_se.angle_dst = angle;
     }
 };
@@ -842,7 +869,8 @@ var joystickServo = nipplejs.create({
     size: joystickSize
 });
 joystickServo.on('move', function (evt, nipple) {
-    ctrlServo.dir = nipple.angle.radian;
+//    ctrlServo.dir = nipple.angle.radian;
+    ctrlServo.dir = nipple.angle.degree;
     ctrlServo.dist = nipple.distance;
 });
 joystickServo.on('end', function () {
