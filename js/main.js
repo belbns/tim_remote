@@ -125,6 +125,8 @@ function handleDisconnection(event) {
     connectDeviceAndCacheCharacteristic(device).
         then(characteristic => startNotifications(characteristic)).
         catch(error => log(error));
+
+    document.getElementById('sw_start').checked = false;
 }
 
 // Отключиться от подключенного устройства
