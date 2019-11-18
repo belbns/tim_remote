@@ -92,6 +92,9 @@ function connect() {
         cleanScreen();
         writeToScreen('== BLE connected ==');
     }
+    else {
+        document.getElementById('sw_start').checked = false;        
+    }
     return ret;
 }
 
