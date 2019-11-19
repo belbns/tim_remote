@@ -248,25 +248,11 @@ function handleCharacteristicValueChanged(event) {
         ctrlStepp[event.sv[0]].turns = event.sv[1];
         // A * 2 * PI / 512 + PI/2
         //ctrlStepp[event.sv[0]].angle_real = event.sv[2] * Math.PI / 256 + Math.PI / 2;
-        /*
-        if (r_angle < (Math.PI / 2 - 0.01)) {
-                param1 = Math.round(r_angle * 256 / Math.PI + 384);
-            }
-            else {
-                param1 = Math.round(r_angle * 256 / Math.PI - 128);   
-            }
-            if (param1 < 0) {
-                param1 = 0;
-            }
-            else if (param1 > 511) {
-                param1 = 511;
-            }
-        */
-        if (event.sv[0] > 384) {
-            ctrlStepp[event.sv[0].angle_real = (event.sv[1] - 384) * Math.PI / 256;
+      if (event.sv[2] > 384) {
+            ctrlStepp[event.sv[0]].angle_real = (event.sv[2] - 384) * Math.PI / 256;
         }
         else {
-            ctrlStepp[event.sv[0].angle_real = (event.sv[1] + 128) * Math.PI / 256;            
+            ctrlStepp[event.sv[0]].angle_real = (event.sv[2] + 128) * Math.PI / 256;            
         }
 
         jPosDraw(ctrlStepp[event.sv[0]]);
