@@ -85,7 +85,7 @@ function connect() {
         then(device => connectDeviceAndCacheCharacteristic(device)).
         then(characteristic => startNotifications(characteristic)).
         catch(error => writeToScreen(error));
-    ret = true; // DEBUG
+    //ret = true; // DEBUG
     if (ret) {
         document.getElementById('rmark_motl').style.visibility = 'visible';
         document.getElementById('rmark_motr').style.visibility = 'visible';
@@ -332,7 +332,7 @@ function handleCharacteristicValueChanged(event) {
 function crtrl_on(sw) {
     if (sw.checked) {
         // connect to BLE
-        //connect();              // DEBUG
+        connect();              // DEBUG
         jPosDraw(ctrlStepp[0]);
         jPosDraw(ctrlStepp[1]);
         jPosMotDraw(ctrlMotors);
@@ -721,7 +721,7 @@ function steppCommand(ctrl_st) {
         if (sendToBLE(ctrl_st.token, cmd, param1, ctrl_st.num)) {
             ctrl_st.cmd = cmd;
             ctrl_st.angle_dst = Math.PI / 2;
-            ctrl_st.angle_real = ctrl_st.angle_dst; // DEBUG
+            //ctrl_st.angle_real = ctrl_st.angle_dst; // DEBUG
         }
     }    
     else {
@@ -740,7 +740,7 @@ function steppCommand(ctrl_st) {
                     if (sendToBLE(ctrl_st.token, cmd, 0, ctrl_st.num))
                     {
                         ctrl_st.cmd = cmd;
-                        ctrl_st.angle_real = ctrl_st.angle_dst + Math.PI / 4; // DEBUG
+                        //ctrl_st.angle_real = ctrl_st.angle_dst + Math.PI / 4; // DEBUG
                     }
                 }
             }
@@ -749,16 +749,16 @@ function steppCommand(ctrl_st) {
                     if (ctrl_st.cmd === 'l') {  // в противоположную сторону - стоп
                         cmd = 's';
                         ctrl_st.angle_dst = Math.PI;
-                        ctrl_st.angle_real = ctrl_st.angle_dst; // DEBUG
+                        //ctrl_st.angle_real = ctrl_st.angle_dst; // DEBUG
                     }
                     else {
                         cmd = 'r';
-                        ctrl_st.angle_real = ctrl_st.angle_dst + Math.PI / 4; // DEBUG
+                        //ctrl_st.angle_real = ctrl_st.angle_dst + Math.PI / 4; // DEBUG
                     }
                     if (sendToBLE(ctrl_st.token, cmd, 0, ctrl_st.num))
                     {
                         ctrl_st.cmd = cmd;
-                        ctrl_st.angle_real = ctrl_st.angle_dst - Math.PI / 4; // DEBUG
+                        //ctrl_st.angle_real = ctrl_st.angle_dst - Math.PI / 4; // DEBUG
                     }
                 }
             }
@@ -783,7 +783,7 @@ function steppCommand(ctrl_st) {
             if (sendToBLE(ctrl_st.token, cmd, param1, ctrl_st.num)) {
                 ctrl_st.cmd = cmd;
                 ctrl_st.angle_dst = r_angle;
-                ctrl_st.angle_real = ctrl_st.angle_dst; // DEBUG
+                //ctrl_st.angle_real = ctrl_st.angle_dst; // DEBUG
             }
         }
     }    
