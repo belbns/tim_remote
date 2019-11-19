@@ -83,7 +83,7 @@ function connect() {
         then(device => connectDeviceAndCacheCharacteristic(device)).
         then(characteristic => startNotifications(characteristic)).
         catch(error => writeToScreen(error));
-
+    ret = true; // ??????????????????????????
     if (ret) {
         document.getElementById('rmark_motl').style.visibility = 'visible';
         document.getElementById('rmark_motr').style.visibility = 'visible';
@@ -157,11 +157,11 @@ function disconnect() {
     }
 
     deviceCache = null;
-
+/* ????????????????????
     document.getElementById('rmark_motl').style.visibility = 'hidden';
     document.getElementById('rmark_motr').style.visibility = 'hidden';
     document.getElementById('rmark_ser').style.visibility = 'hidden';
-
+*/
 }
 
 // Подключение к определенному устройству, получение сервиса и характеристики
