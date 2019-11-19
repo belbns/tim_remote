@@ -208,7 +208,7 @@ html, body {
   position: absolute;
   padding: 0;
   margin: 0 0;
-  visibility: hidden;
+  //visibility: hidden;
 }
 
 #rmark_ser {
@@ -220,7 +220,7 @@ html, body {
   padding: 0;
   margin: 0 0;
   transform: rotate(0deg);
-  visibility: hidden;
+  //visibility: hidden;
 }
 
 // ---------- switch -----------

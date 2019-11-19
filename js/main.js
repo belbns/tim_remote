@@ -1,7 +1,9 @@
+// длина очереди команд в МП
+const CmdQueueLen = 10;
 // переменные управления мобильной платформой
 var ctrlMotors = {  // ДПТ
     state: 's',         // теущий статус <- МП ("s"|"r"|"l"|"f"|"b")
-    queue: 0,           // наличие команд моторов в очереди <- МП
+    queue: CmdQueueLen, // свободное место для команд в очереди <- МП
     cmd: 's',           // последняя команда -> МП ("s"|"r"|"l"|"f"|"b")
     v_dst: 0,           // заданная скорость -> МП (-3..0..3)
     v_real: 3,          // реальная скорость <- МП
@@ -23,7 +25,7 @@ var ctrlServo = {
 //    angle_real: Math.PI/2,
     angle_dst: 90,  
     angle_real: 90,
-    queue: 0,           // наличие команд в очереди <- МП
+    queue: CmdQueueLen, // свободное место для команд в очереди <- МП
     dir: 0,
     dist: 0 ,
     id: 'servo',
@@ -34,11 +36,11 @@ var ctrlServo = {
 }
 
 var ctrlStepp = [
-    { num: 0,  mode: 'm', state: 's', queue: 0, cmd: 's', angle_dst: Math.PI/2, 
+    { num: 0,  mode: 'm', state: 's', queue: CmdQueueLen, cmd: 's', angle_dst: Math.PI/2, 
         angle_real: Math.PI/2, turn: 'n', dir: Math.PI/2, dist: 0, id: 'stepp1', token: 'st', 
         info: 'stepp1_info', modesw : 'sw_st1', markd: 'mark_st1', markr: 'rmark_st1' 
     },
-    { num: 1,  mode: 'm', state: 's', queue: 0, cmd: 's', angle_dst: Math.PI/2, 
+    { num: 1,  mode: 'm', state: 's', queue: CmdQueueLen, cmd: 's', angle_dst: Math.PI/2, 
         angle_real: Math.PI/2, turn: 'n', dir: Math.PI/2, dist: 0, id: 'stepp2', token: 'st',
         info: 'stepp2_info', modesw : 'sw_st2', markd: 'mark_st2', markr: 'rmark_st2' 
     } ];
@@ -83,7 +85,7 @@ function connect() {
         then(device => connectDeviceAndCacheCharacteristic(device)).
         then(characteristic => startNotifications(characteristic)).
         catch(error => writeToScreen(error));
-    ret = true; // ??????????????????????????
+    ret = true; // DEBUG
     if (ret) {
         document.getElementById('rmark_motl').style.visibility = 'visible';
         document.getElementById('rmark_motr').style.visibility = 'visible';
@@ -157,11 +159,10 @@ function disconnect() {
     }
 
     deviceCache = null;
-/* ????????????????????
     document.getElementById('rmark_motl').style.visibility = 'hidden';
     document.getElementById('rmark_motr').style.visibility = 'hidden';
     document.getElementById('rmark_ser').style.visibility = 'hidden';
-*/
+
 }
 
 // Подключение к определенному устройству, получение сервиса и характеристики
@@ -214,28 +215,25 @@ function handleCharacteristicValueChanged(event) {
     var event = JSON.parse(value);
     if (event.hasOwnProperty('ms')) {
         ctrlMotors.state = event.ms[0];
-        var vv = event.ms[1];
-        if (vv > 3) {
-            vv = -(vv - 4);
+        if ((ctrlMotors.state === 's') || (ctrlMotors.state === 'a'))
+        {
+            ctrlMotors.v_real = ctrlMotors.v_left = ctrlMotors.v_right = 0;
         }
-        ctrlMotors.v_real = vv;
-        vv = event.ms[2];
-        if (vv > 3) {
-            vv = -(vv - 4);
+        else if ((ctrlMotors.state === 'f') || (ctrlMotors.state === 'b'))
+        {
+            ctrlMotors.v_real = ctrlMotors.v_left = ctrlMotors.v_right = event.ms[1];
         }
-        ctrlMotors.v_left = vv;
-        vv = event.ms[3];
-        if (vv > 3) {
-            vv = -(vv - 4);
+        else if ((ctrlMotors.state === 'l') || (ctrlMotors.state === 'r'))
+        {
+            ctrlMotors.v_left = event.ms[1];
+            ctrlMotors.v_right = event.ms[2];
         }
-        ctrlMotors.v_right = vv;
         jPosMotDraw(ctrlMotors)
     }
     else if (event.hasOwnProperty('qmot')) {
         ctrlMotors.queue = event.qmot;
     }
     else if(event.hasOwnProperty('servo')) {
-    //    ctrlServo.angle_real = (event.servo - 180) * Math.PI / 180;
         ctrlServo.angle_real = event.servo;
         jPosDrawServo(ctrlServo);
     }
@@ -248,8 +246,29 @@ function handleCharacteristicValueChanged(event) {
     }
     else if (event.hasOwnProperty('sv')) {
         ctrlStepp[event.sv[0]].turns = event.sv[1];
-        // A * 2 * PI /512 + PI/2
-        ctrlStepp[event.sv[0]].angle_real = event.sv[2] * Math.PI / 256 + Math.PI / 2;
+        // A * 2 * PI / 512 + PI/2
+        //ctrlStepp[event.sv[0]].angle_real = event.sv[2] * Math.PI / 256 + Math.PI / 2;
+        /*
+        if (r_angle < (Math.PI / 2 - 0.01)) {
+                param1 = Math.round(r_angle * 256 / Math.PI + 384);
+            }
+            else {
+                param1 = Math.round(r_angle * 256 / Math.PI - 128);   
+            }
+            if (param1 < 0) {
+                param1 = 0;
+            }
+            else if (param1 > 511) {
+                param1 = 511;
+            }
+        */
+        if (event.sv[0] > 384) {
+            ctrlStepp[event.sv[0].angle_real = (event.sv[1] - 384) * Math.PI / 256;
+        }
+        else {
+            ctrlStepp[event.sv[0].angle_real = (event.sv[1] + 128) * Math.PI / 256;            
+        }
+
         jPosDraw(ctrlStepp[event.sv[0]]);
     }
     else if (event.hasOwnProperty('qst1')) {
@@ -313,7 +332,7 @@ function handleCharacteristicValueChanged(event) {
 function crtrl_on(sw) {
     if (sw.checked) {
         // connect to BLE
-        //connect();              // ????????????????
+        //connect();              // DEBUG
         jPosDraw(ctrlStepp[0]);
         jPosDraw(ctrlStepp[1]);
         jPosMotDraw(ctrlMotors);
@@ -365,9 +384,6 @@ function sendToBLE(token, newcmd, par1, devnum) {
     switch(token) {
         case 'mot':
             var p1 = par1;
-            if (par1 < 0) {
-                p1 = 4 - par1;
-            }
             if ((newcmd === 'l') || (newcmd === 'r') || (newcmd === 'n') || (newcmd === 's')) {
                 st = st + '"' + newcmd + '"';    
             }
@@ -452,16 +468,16 @@ function jPosDraw(ctrl_j) {
 
 function jPosDrawServo(ctrl_j) {
     var xy = calcContCenter(ctrl_j.id);
-    var a = ctrl_j.angle_real;
-    var a_rad = a * Math.PI / 180;
+    //var a = ctrl_j.angle_real;
+    //var a_rad = a * Math.PI / 180;
     var mr = document.getElementById(ctrl_j.markr);
 
     mr.style.left = xy['x'] - 64 + 'px';
     mr.style.top = xy['y'] - 64 + 'px';
-    mr.style.transform = "rotate(" + String(Math.PI / 2 - a_rad) + "rad)";
-    //mr.style.transform = "rotate(" + String(90 - ctrl_j.angle_real) + "deg)";
+    //mr.style.transform = "rotate(" + String(Math.PI / 2 - a_rad) + "rad)";
+    mr.style.transform = "rotate(" + String(90 - ctrl_j.angle_real) + "deg)";
 
-    a_rad = ctrl_j.angle_dst * Math.PI / 180;
+    var a_rad = ctrl_j.angle_dst * Math.PI / 180;
     var md = document.getElementById(ctrl_j.markd);
     x = xy['x'] + dmarkR * Math.cos(a_rad);
     y = xy['y'] - dmarkR * Math.sin(a_rad);
@@ -563,12 +579,15 @@ function motorCommand(ctrl_m) {
         if ( sendToBLE(ctrl_m.token, 'n', ctrl_m.v_dst, 0) ) {
             if (ctrl_m.v_dst > 0) {
                 ctrl_m.cmd = 'f';
+                //ctrl_m.v_right = ctrl_m.v_left = ctrl_m.v_real; // DEBUG
             }
             else if (ctrl_m.v_dst < 0) {
                 ctrl_m.cmd = 'b';
+                //ctrl_m.v_right = ctrl_m.v_left = ctrl_m.v_real; // DEBUG
             }
             else {
                 ctrl_m.cmd = 's';
+                //ctrl_m.v_right = ctrl_m.v_left = ctrl_m.v_real = 0; // DEBUG
             }
             //document.getElementById(ctrl_m.id).style['background-image'] = 'none';
         }
@@ -578,6 +597,8 @@ function motorCommand(ctrl_m) {
         if ( sendToBLE(ctrl_m.token, 's', 0, 0) ) {
             ctrl_m.cmd = 's';
             ctrl_m.v_dst = 0;
+            //ctrl_m.v_real = ctrl_m.v_left = ctrl_m.v_right = 0; // DEBUG
+
             //document.getElementById(ctrl_m.id).style['background-image'] = 'none';
         }
     }
@@ -617,6 +638,7 @@ function motorCommand(ctrl_m) {
                         if (sendToBLE(ctrl_m.token, cmd, v, 0)) {
                             ctrl_m.cmd = cmd;
                             ctrl_m.v_dst = v;
+                            //ctrl_m.v_real = ctrl_m.v_left = ctrl_m.v_right = v; // DEBUG
                         }
                     }
                 }
@@ -632,9 +654,11 @@ function motorCommand(ctrl_m) {
                     v -= 1;
                     if (v > 0) {
                         cmd = 'f';
+                        //ctrl_m.v_real = ctrl_m.v_left = ctrl_m.v_right = v; // DEBUG
                     }
                     else if (v < 0) {
                         cmd = 'b';
+                        //ctrl_m.v_real = ctrl_m.v_left = ctrl_m.v_right = v; // DEBUG
                     }
                     else {  // == 0
                         cmd = 's';
@@ -658,6 +682,8 @@ function motorCommand(ctrl_m) {
             else {
                 if (sendToBLE(ctrl_m.token, 'l', 0, 0)) {
                     ctrl_m.cmd = 'l';
+                    //ctrl_m.v_left = 0;              // DEBUG
+                    //ctrl_m.v_right = ctrl_m.v_real; // DEBUG
                 }                
             }
         }
@@ -668,6 +694,8 @@ function motorCommand(ctrl_m) {
             else {
                 if (sendToBLE(ctrl_m.token, 'r', 0, 0)) {
                     ctrl_m.cmd = 'r';
+                    //ctrl_m.v_right = 0;             // DEBUG
+                    //ctrl_m.v_left = ctrl_m.v_real; // DEBUG
                 }                
             }
         }
@@ -684,8 +712,7 @@ function steppCommand(ctrl_st) {
                 cmd = 'h';
                 break;
             case 'h':               // h уже посылали, посылаем h - home со сбросом оборотов 
-                cmd = 'h';
-                param1 = 1;
+                cmd = 'n';
                 break;
             default:
                 cmd = 's';
@@ -694,6 +721,7 @@ function steppCommand(ctrl_st) {
         if (sendToBLE(ctrl_st.token, cmd, param1, ctrl_st.num)) {
             ctrl_st.cmd = cmd;
             ctrl_st.angle_dst = Math.PI / 2;
+            ctrl_st.angle_real = ctrl_st.angle_dst; // DEBUG
         }
     }    
     else {
@@ -712,6 +740,7 @@ function steppCommand(ctrl_st) {
                     if (sendToBLE(ctrl_st.token, cmd, 0, ctrl_st.num))
                     {
                         ctrl_st.cmd = cmd;
+                        ctrl_st.angle_real = ctrl_st.angle_dst + Math.PI / 4; // DEBUG
                     }
                 }
             }
@@ -720,29 +749,41 @@ function steppCommand(ctrl_st) {
                     if (ctrl_st.cmd === 'l') {  // в противоположную сторону - стоп
                         cmd = 's';
                         ctrl_st.angle_dst = Math.PI;
+                        ctrl_st.angle_real = ctrl_st.angle_dst; // DEBUG
                     }
                     else {
                         cmd = 'r';
+                        ctrl_st.angle_real = ctrl_st.angle_dst + Math.PI / 4; // DEBUG
                     }
                     if (sendToBLE(ctrl_st.token, cmd, 0, ctrl_st.num))
                     {
                         ctrl_st.cmd = cmd;
+                        ctrl_st.angle_real = ctrl_st.angle_dst - Math.PI / 4; // DEBUG
                     }
                 }
             }
             // на остальное не обращаем внимание
         }
         else {  // режим - угол - установка ШД в заданное положение
-            var an = r_angle - Math.PI / 2; // поворачиваем вправо на Pi/2
-            if (an < 0) {
-                an += Math.PI * 2;
+            if (r_angle < (Math.PI / 2 - 0.01)) {
+                param1 = Math.round(r_angle * 256 / Math.PI + 384);
             }
-            param1 = Math.round(an * 512 / (2 * Math.PI));  // пересчитываем в шаги ШД
+            else {
+                param1 = Math.round(r_angle * 256 / Math.PI - 128);   
+            }
+            if (param1 < 0) {
+                param1 = 0;
+            }
+            else if (param1 > 511) {
+                param1 = 511;
+            }
+
+            //param1 = Math.round(an * 512 / (2 * Math.PI));  // пересчитываем в шаги ШД
             cmd = 'a';
-            if (sendToBLE(ctrl_st.token, cmd, param1, ctrl_st.num))
-            {
+            if (sendToBLE(ctrl_st.token, cmd, param1, ctrl_st.num)) {
                 ctrl_st.cmd = cmd;
                 ctrl_st.angle_dst = r_angle;
+                ctrl_st.angle_real = ctrl_st.angle_dst; // DEBUG
             }
         }
     }    
@@ -750,23 +791,6 @@ function steppCommand(ctrl_st) {
 
 
 function servoCommand(ctrl_se) {
-/*
-    function angleLimit(a) {
-        var an = a;
-        if (an > Math.PI) {
-            if (an < (Math.PI * 5 / 4)) {
-                an = Math.PI;
-            }
-            else if (an > (Math.PI * 7 / 4)) {
-                an = 0;
-            }
-            else {
-                an = Math.PI / 2;   // нижний сектор - стоп
-            }
-        }
-        return an;
-    }
-*/
     function angleLimit(a) {
         var an = a;
         if (an > 180) {
@@ -783,21 +807,10 @@ function servoCommand(ctrl_se) {
         return an;
     }
 
-/*
-    function servoAngle(al) {
-        return 180 + Math.round(al * 180 / Math.PI);
-    }
-*/
-//    var angle = Math.PI / 2; // если нажатие будет в центре - возврат в Pi/2
     var angle = 90; // если нажатие будет в центре - возврат в 90 град.
     if (ctrl_se.dist > (joystickSize / 2 - 10)) {
         angle = angleLimit(ctrl_se.dir);
     }
-/*
-    if (sendToBLE(ctrl_se.token, 's', servoAngle(angle), 0)) {
-        ctrl_se.angle_dst = angle;
-    }
-    */
     if (sendToBLE(ctrl_se.token, 's', angle, 0)) {
         ctrl_se.angle_dst = angle;
     }
@@ -817,8 +830,9 @@ joystickStepp1.on('move', function (evt, nipple) {
 });
 joystickStepp1.on('end', function () {
     var outputEl = document.getElementById('stepp1_info');
-    outputEl.innerHTML = 'dir=' + ctrlStepp[0].dir.toFixed(4) + ' dist=' + ctrlStepp[0].dist.toFixed(4);
+    //outputEl.innerHTML = 'dir=' + ctrlStepp[0].dir.toFixed(4) + ' dist=' + ctrlStepp[0].dist.toFixed(4);
     if (ctrlFlag) {
+        outputEl.innerHTML = 'STEPPER1 (Qrem= ' + ctrlStepp[0].queue + ')';
         steppCommand(ctrlStepp[0]);
         jPosDraw(ctrlStepp[0]);
     }
@@ -837,8 +851,9 @@ joystickStepp2.on('move', function (evt, nipple) {
 });
 joystickStepp2.on('end', function () {
     var outputEl = document.getElementById('stepp2_info');
-    outputEl.innerHTML = 'dir=' + ctrlStepp[1].dir.toFixed(0) + ' dist=' + ctrlStepp[1].dist.toFixed(0);
+    //outputEl.innerHTML = 'dir=' + ctrlStepp[1].dir.toFixed(0) + ' dist=' + ctrlStepp[1].dist.toFixed(0);
     if (ctrlFlag) {
+        outputEl.innerHTML = 'STEPPER2 (Qrem= ' + ctrlStepp[1].queue + ')';
         steppCommand(ctrlStepp[1]);
         jPosDraw(ctrlStepp[1]);
     }
@@ -859,8 +874,9 @@ joystickMotors.on('move', function (evt, nipple) {
 });
 joystickMotors.on('end', function () {
     var outputEl = document.getElementById('motors_info');
-    outputEl.innerHTML = 'dir=' + ctrlMotors.dir.toFixed(0) + ' dist=' + ctrlMotors.dist.toFixed(0);
+    //outputEl.innerHTML = 'dir=' + ctrlMotors.dir.toFixed(0) + ' dist=' + ctrlMotors.dist.toFixed(0);
     if (ctrlFlag) {
+        outputEl.innerHTML = 'MOTORS (Qrem= ' + ctrlMotors.queue + ')';
         motorCommand(ctrlMotors);
         jPosMotDraw(ctrlMotors);
     }
@@ -875,14 +891,14 @@ var joystickServo = nipplejs.create({
     size: joystickSize
 });
 joystickServo.on('move', function (evt, nipple) {
-//    ctrlServo.dir = nipple.angle.radian;
     ctrlServo.dir = Math.round(nipple.angle.degree);
     ctrlServo.dist = nipple.distance;
 });
 joystickServo.on('end', function () {
     var outputEl = document.getElementById('servo_info');
-    outputEl.innerHTML = 'dir=' + ctrlServo.dir.toFixed(0) + ' dist=' + ctrlServo.dist.toFixed(2);
+    //outputEl.innerHTML = 'dir=' + ctrlServo.dir.toFixed(0) + ' dist=' + ctrlServo.dist.toFixed(2);
     if (ctrlFlag) {
+        outputEl.innerHTML = 'SERVO (Qrem= ' + ctrlServo.queue + ')';
         servoCommand(ctrlServo);
         jPosDrawServo(ctrlServo);
     }
