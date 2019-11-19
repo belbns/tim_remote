@@ -313,7 +313,7 @@ function handleCharacteristicValueChanged(event) {
 function crtrl_on(sw) {
     if (sw.checked) {
         // connect to BLE
-        connect();
+        //connect();              // ????????????????
         jPosDraw(ctrlStepp[0]);
         jPosDraw(ctrlStepp[1]);
         jPosMotDraw(ctrlMotors);
@@ -394,7 +394,7 @@ function sendToBLE(token, newcmd, par1, devnum) {
             break;
         case 'echo':
         case 'servo':
-            st = st + '["' + newcmd + '",' + devnum.toString() + ']';
+            st = st + '["' + newcmd + '",' + par1.toString() + ']';
             break;
         case 'dist':
             st = st + '"' + newcmd + '"';
@@ -458,8 +458,8 @@ function jPosDrawServo(ctrl_j) {
 
     mr.style.left = xy['x'] - 64 + 'px';
     mr.style.top = xy['y'] - 64 + 'px';
-//    mr.style.transform = "rotate(" + String(Math.PI / 2 - ctrl_j.angle_real) + "rad)";
-    mr.style.transform = "rotate(" + String(90 - ctrl_j.angle_real) + "deg)";
+    mr.style.transform = "rotate(" + String(Math.PI / 2 - a_rad) + "rad)";
+    //mr.style.transform = "rotate(" + String(90 - ctrl_j.angle_real) + "deg)";
 
     a_rad = ctrl_j.angle_dst * Math.PI / 180;
     var md = document.getElementById(ctrl_j.markd);
@@ -876,7 +876,7 @@ var joystickServo = nipplejs.create({
 });
 joystickServo.on('move', function (evt, nipple) {
 //    ctrlServo.dir = nipple.angle.radian;
-    ctrlServo.dir = nipple.angle.degree;
+    ctrlServo.dir = Math.round(nipple.angle.degree);
     ctrlServo.dist = nipple.distance;
 });
 joystickServo.on('end', function () {
