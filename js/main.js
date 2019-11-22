@@ -942,6 +942,7 @@ function led_switch(clicked_id) {
 
 function rem_poweroff() {
     sendToBLE("stop", '?', false, 0);
+    sendToBLE("pause", '?', 500, 0);
     sendToBLE("pwroff", '?', false, 0);
 }
 
