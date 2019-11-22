@@ -241,8 +241,14 @@ function handleCharacteristicValueChanged(event) {
         ctrlServo.queue = event.qservo;
     }
     else if (event.hasOwnProperty('ss')) {
-        ctrlStepp[event.ss[0]].state = event.ss[1];
-        ctrlStepp[event.ss[0]].mode = event.ss[2];
+        var stnum = event.ss[0];
+        ctrlStepp[stnum].state = event.ss[1];
+        ctrlStepp[stnum].mode = event.ss[2];
+        if (ctrlStepp[stnum].mode === 'm')
+        {
+            document.getElementById(ctrlStepp[stnum].modesw).checked = false;
+        }
+
     }
     else if (event.hasOwnProperty('sv')) {
         ctrlStepp[event.sv[0]].turns = event.sv[1];
