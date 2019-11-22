@@ -37,11 +37,11 @@ var ctrlServo = {
 
 var ctrlStepp = [
     { num: 0,  mode: 'm', state: 's', queue: CmdQueueLen, cmd: 's', angle_dst: Math.PI/2, 
-        angle_real: Math.PI/2, turn: 'n', dir: Math.PI/2, dist: 0, id: 'stepp1', token: 'st', 
+        angle_real: Math.PI/2, turns: 0, dir: Math.PI/2, dist: 0, id: 'stepp1', token: 'st', 
         info: 'stepp1_info', modesw : 'sw_st1', markd: 'mark_st1', markr: 'rmark_st1' 
     },
     { num: 1,  mode: 'm', state: 's', queue: CmdQueueLen, cmd: 's', angle_dst: Math.PI/2, 
-        angle_real: Math.PI/2, turn: 'n', dir: Math.PI/2, dist: 0, id: 'stepp2', token: 'st',
+        angle_real: Math.PI/2, turns: 0, dir: Math.PI/2, dist: 0, id: 'stepp2', token: 'st',
         info: 'stepp2_info', modesw : 'sw_st2', markd: 'mark_st2', markr: 'rmark_st2' 
     } ];
 
@@ -692,16 +692,16 @@ function steppCommand(ctrl_st) {
     var cmd = 's';
     var param1 = 0;
     if (ctrl_st.dist < joystickSize / 2) { // нажатие в центре - стоп или возврат в 0
-
-        switch (ctrl_st.cmd) {
-            case 's':               // s уже посылали, посылаем h - home без сброса оборотов
-                cmd = 'h';
-                break;
-            case 'h':               // h уже посылали, посылаем h - home со сбросом оборотов 
-                cmd = 'n';
-                break;
-            default:
-                cmd = 's';
+        if (ctrl_st.state === 'v') {
+            cmd = 's';
+        }
+        else {
+            if (ctrl_st.cmd === 's') {  // предыдущая команда была "стоп"
+                cmd = 'h'; // - home без сброса оборотов
+            }
+            else if (ctrl_st.cmd === 'h') {  // предыдущая команда была home без сброса оборотов
+                cmd = 'n'; //n - home со сбросом оборотов 
+            }
         }
 
         if (sendToBLE(ctrl_st.token, cmd, param1, ctrl_st.num)) {
