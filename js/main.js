@@ -824,7 +824,6 @@ joystickStepp1.on('move', function (evt, nipple) {
 });
 joystickStepp1.on('end', function () {
     var outputEl = document.getElementById('stepp1_info');
-    //outputEl.innerHTML = 'dir=' + ctrlStepp[0].dir.toFixed(4) + ' dist=' + ctrlStepp[0].dist.toFixed(4);
     if (ctrlFlag) {
         outputEl.innerHTML = 'STEPPER1 (Qrem= ' + ctrlStepp[0].queue + ')';
         steppCommand(ctrlStepp[0]);
@@ -939,6 +938,10 @@ function led_switch(clicked_id) {
         butt.style['background-image'] = st;
         ctrlLeds[led] = l;
     }
+}
+
+function rem_poweroff() {
+    sendToBLE("pwroff", '?', false, 0);
 }
 
 function resize_on() {
