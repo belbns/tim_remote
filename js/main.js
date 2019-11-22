@@ -54,8 +54,9 @@ var adc_val = [0, 0, 0, 0];
 var LowBatt = false;
 var HighLoad = false;
 
-const adcBattMin = 1580;
-const battMeterMax = 120;
+//const adcBattMin = 2390;
+const adcBattMin = 2200;
+const battMeterMax = 140;
 /*
 var storage = window.localStorage;
 
@@ -273,7 +274,8 @@ function handleCharacteristicValueChanged(event) {
         adc_val[event.adc[0]] = event.adc[1];
         var meterb = document.getElementById('battery');
         if (event.adc[0] == 0) {    // 3.3v
-            var vt = Math.round((adc_val[0] - adcBattMin) / 3);
+            //var vt = Math.round((adc_val[0] - adcBattMin) / 3);
+            var vt = Math.round((adc_val[0] - adcBattMin) / 5);
             if (vt > 0) {
                 if (vt > battMeterMax) {
                     vt = battMeterMax;
@@ -420,7 +422,7 @@ function sendToBLE(token, newcmd, par1, devnum) {
     return true;
 };
 
-const joystickSize = 160;
+const joystickSize = 200;
 var markR = joystickSize / 2 - 3;
 var markD = joystickSize / 2 + 3;
 
@@ -721,7 +723,7 @@ function steppCommand(ctrl_st) {
         var sw = document.getElementById(ctrl_st.modesw);
         if (sw.checked) {   // режим - вращение
             if ( (r_angle > (Math.PI / 2)) && (r_angle < (3 * Math.PI / 2)) ) { // влево
-                if (ctrl_st.cmd !== 'l') {  // если не повторяем прежнюю команду
+                if (ctrl_st.state !== 'l') {  // если не повторяем прежнюю команду
                     if (ctrl_st.cmd === 'r') {  // в противоположную сторону - стоп
                         cmd = 's';
                         ctrl_st.angle_dst = Math.PI;
@@ -737,7 +739,7 @@ function steppCommand(ctrl_st) {
                 }
             }
             else if ( (r_angle < (Math.PI / 2)) || (r_angle > (3 * Math.PI / 2)) ) { // вправо
-                if (ctrl_st.cmd !== 'r') {  // если не повторяем прежнюю команду
+                if (ctrl_st.state !== 'r') {  // если не повторяем прежнюю команду
                     if (ctrl_st.cmd === 'l') {  // в противоположную сторону - стоп
                         cmd = 's';
                         ctrl_st.angle_dst = Math.PI;
